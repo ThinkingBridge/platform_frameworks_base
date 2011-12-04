@@ -1774,6 +1774,9 @@
   <java-symbol type="array" name="shutdown_reboot_actions" />
   <java-symbol type="string" name="reboot_system" />
   
+  <!-- LegacyUSB -->
+  <java-symbol type="string" name="config_legacyUmsLunFile" />
+  
   <!-- Notification and Battery light -->
   <java-symbol type="array" name="notification_light_package_mapping" />
   <java-symbol type="bool" name="config_multiColorBatteryLed" />
