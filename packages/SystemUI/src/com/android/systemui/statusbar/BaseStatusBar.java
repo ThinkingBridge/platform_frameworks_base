@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -908,6 +907,21 @@ public abstract class BaseStatusBar extends SystemUI implements
                     "com.android.systemui.recent.RecentsActivity");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                     | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            
+            boolean isXlarge = (mContext.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE;  
+            boolean autoRotate = Settings.System.getInt(mContext.getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 1) == 1;
+            
+            if (!autoRotate) {
+            	WindowManager mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+            	Display mDisplay = mWindowManager.getDefaultDisplay();
+            	int rotation = mDisplay.getRotation();
+            	
+            	if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+            		intent.putExtra("Portrait", isXlarge?1:2);
+            	} else {
+            		intent.putExtra("Portrait", isXlarge?2:1);
+            	}
+            }
 
             if (firstTask == null) {
                 if (RecentsActivity.forceOpaqueBackground(mContext)) {
