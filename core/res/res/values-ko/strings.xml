@@ -1529,4 +1529,6 @@
     <string name="action_alarm">알람</string>
     <string name="action_null">없음</string>
     <string name="action_app">사용자 앱/바로가기</string>
+    
+    <string name="trash">버리기</string>
 </resources>
