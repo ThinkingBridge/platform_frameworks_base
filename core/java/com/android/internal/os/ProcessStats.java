@@ -702,9 +702,7 @@ public class ProcessStats {
 
         long sampleTime = mCurrentSampleTime - mLastSampleTime;
         long sampleRealTime = mCurrentSampleRealTime - mLastSampleRealTime;
-        long percAwake = ((sampleRealTime > 0)
-            ? (sampleTime*100) / sampleRealTime
-            : 100);
+        long percAwake = sampleRealTime > 0 ? ((sampleTime*100) / sampleRealTime) : 0;
         if (percAwake != 100) {
             pw.print(" with ");
             pw.print(percAwake);
