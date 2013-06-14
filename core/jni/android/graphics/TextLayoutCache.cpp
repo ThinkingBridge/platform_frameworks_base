@@ -144,7 +144,8 @@ sp<TextLayoutValue> TextLayoutCache::getValue(const SkPaint* paint,
                     "This indicates that the cache already has an entry with the "
                     "same key but it should not since we checked earlier!"
                     " - start = %d, count = %d, contextCount = %d - Text = '%s'",
-                    start, count, contextCount, String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+
+                    start, count, contextCount, String8(key.getText() + start, count).string());
 
             if (mDebugEnabled) {
                 nsecs_t totalTime = systemTime(SYSTEM_TIME_MONOTONIC) - startTime;
@@ -155,7 +156,8 @@ sp<TextLayoutValue> TextLayoutCache::getValue(const SkPaint* paint,
                         value.get(), start, count, contextCount, size, mMaxSize - mSize,
                         value->getElapsedTime() * 0.000001f,
                         (totalTime - value->getElapsedTime()) * 0.000001f,
-                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+
+                        String8(key.getText() + start, count).string());
 
             }
         } else {
@@ -166,7 +168,8 @@ sp<TextLayoutValue> TextLayoutCache::getValue(const SkPaint* paint,
                         " - Compute time %0.6f ms - Text = '%s'",
                         start, count, contextCount, size, mMaxSize - mSize,
                         value->getElapsedTime() * 0.000001f,
-                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+
+                        String8(key.getText() + start, count).string());
 
             }
         }
@@ -187,7 +190,8 @@ sp<TextLayoutValue> TextLayoutCache::getValue(const SkPaint* paint,
                         value->getElapsedTime() * 0.000001f,
                         elapsedTimeThruCacheGet * 0.000001f,
                         deltaPercent,
-                        String8(reinterpret_cast<const char16_t*>(key.getText() + start), count).string());
+
+                        String8(key.getText() + start, count).string());
 
             }
             if (mCacheHitCount % DEFAULT_DUMP_STATS_CACHE_HIT_INTERVAL == 0) {
@@ -234,7 +238,7 @@ TextLayoutCacheKey::TextLayoutCacheKey(const SkPaint* paint, const UChar* text,
         size_t start, size_t count, size_t contextCount, int dirFlags) :
             start(start), count(count), contextCount(contextCount),
             dirFlags(dirFlags) {
-    textCopy.setTo(reinterpret_cast<const char16_t*>(text), contextCount);
+    textCopy.setTo(text, contextCount);
     typeface = paint->getTypeface();
     textSize = paint->getTextSize();
     textSkewX = paint->getTextSkewX();
