@@ -205,7 +205,7 @@
     <string name="status_bar_help_text" msgid="7874607155052076323">"아래로 스와이프하여 언제든 액세스하세요."\n"한 번 더 아래로 스와이프하면 시스템 관리로 이동합니다."</string>
 
     <!--  Target/Action Strings -->
-    <string name="shortcut_label">Carbon 행동</string>
+    <string name="shortcut_label">SystemUI 액션</string>
     <string name="action_home">홈으로 가기</string>
     <string name="action_back">뒤로가기</string>
     <string name="action_recents">최근앱 창</string>
@@ -268,13 +268,9 @@
     <string name="quick_settings_pie_off_label">파이 꺼짐</string>
     <string name="quick_settings_sleep_label">화면 끄기</string>
     <string name="quick_settings_volume_label">볼륨</string>
-    <string name="quick_settings_trds_on_label">다크 카본 켜짐</string>
-    <string name="quick_settings_trds_off_label">다크 카본 꺼짐</string>
+    <string name="quick_settings_trds_on_label">다크 모드 켜짐</string>
+    <string name="quick_settings_trds_off_label">다크 모드 꺼짐</string>
     <string name="quick_settings_powermenu_label">전원 메뉴</string>
-
-    <!-- Recents Ram Bar -->
-    <string name="service_free_mem"><xliff:g id="memory">%1$s</xliff:g> 사용 가능</string>
-    <string name="service_used_mem"><xliff:g id="memory">%1$s</xliff:g> 사용됨</string>
 
     <!-- Label in drop down to identify brightness slider -->
     <string name="brightness_label">밝기</string>

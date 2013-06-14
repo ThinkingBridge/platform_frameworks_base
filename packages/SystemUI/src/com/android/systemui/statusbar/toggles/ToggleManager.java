@@ -95,7 +95,6 @@ public class ToggleManager {
     public static final String STATUSBAR_TOGGLE = "STATUSBAR";
     public static final String PIE_TOGGLE = "PIE";
     public static final String SLEEP_TOGGLE = "SLEEP";
-    public static final String CARBON_TOGGLE = "CARBON";
     public static final String TRDS_TOGGLE = "TRDS";
     public static final String POWERMENU_TOGGLE = "POWERMENU";
     public static final String PROFILE_TOGGLE = "PROFILE";
@@ -168,7 +167,6 @@ public class ToggleManager {
             toggleMap.put(STATUSBAR_TOGGLE, StatusbarToggle.class);
             toggleMap.put(PIE_TOGGLE, PieToggle.class);
             toggleMap.put(SLEEP_TOGGLE, SleepToggle.class);
-            toggleMap.put(CARBON_TOGGLE, CarbonToggle.class);
             toggleMap.put(TRDS_TOGGLE, TRDSToggle.class);
             toggleMap.put(POWERMENU_TOGGLE, PowerMenuToggle.class);
             toggleMap.put(PROFILE_TOGGLE, ProfileToggle.class);
@@ -391,7 +389,6 @@ public class ToggleManager {
         if (deviceSupportsBluetooth()) {
             tiles.add(BLUETOOTH_TOGGLE);
         }
-        tiles.add(CARBON_TOGGLE);
         return tiles;
     }
 

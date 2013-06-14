@@ -549,7 +549,7 @@
     <string name="ribbon">Ribbon</string>
 
     <!--  Target/Action Strings -->
-    <string name="shortcut_label">Carbon Actions</string>
+    <string name="shortcut_label">SystemUI Actions</string>
     <string name="action_home">Home</string>
     <string name="action_back">Back</string>
     <string name="action_recents">Recents</string>
@@ -616,9 +616,8 @@
     <string name="quick_settings_pie_off_label">Pie Off</string>
     <string name="quick_settings_sleep_label">Sleep</string>
     <string name="quick_settings_volume_label">Volume</string>
-    <string name="quick_settings_carbon_label">Carbon</string>
-    <string name="quick_settings_trds_on_label">Dark Carbon On</string>
-    <string name="quick_settings_trds_off_label">Dark Carbon Off</string>
+    <string name="quick_settings_trds_on_label">Dark Mode On</string>
+    <string name="quick_settings_trds_off_label">Dark Mode Off</string>
     <string name="quick_settings_powermenu_label">Power Menu</string>
     <string name="quick_settings_screenshot_label">Screenshot</string>
     <string name="quick_settings_stayawake_on">Stay Awake On</string>
@@ -626,13 +625,6 @@
     <string name="quick_settings_adb_on"><xliff:g id="ip" example="192.168.1.5">%s</xliff:g></string>
     <string name="quick_settings_adb_off">Wireless ADB Off</string>
     <string name="quick_settings_profile">Profile</string>
-
-    <!-- Recents Ram Bar -->
-    <string name="memory">RAM</string>
-    <!-- [CHAR LIMIT=10] Running services, summary of background processes -->
-    <string name="service_free_mem"><xliff:g id="memory">%1$s</xliff:g> free</string>
-    <!-- [CHAR LIMIT=10] Running services, summary of foreground processes -->
-    <string name="service_used_mem"><xliff:g id="memory">%1$s</xliff:g> used</string>
 
     <!-- Label in drop down to identify brightness slider -->
     <string name="brightness_label">Brightness</string>
