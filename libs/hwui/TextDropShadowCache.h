@@ -50,10 +50,10 @@ struct ShadowText {
         }
 
         const float skewX = paint->getTextSkewX();
-        memcpy(&italicStyle, &skewX, sizeof(italicStyle));
+        italicStyle = *(uint32_t*) &skewX;
 
         const float scaleXFloat = paint->getTextScaleX();
-        memcpy(&scaleX, &scaleXFloat, sizeof(scaleX));
+        scaleX = *(uint32_t*) &scaleXFloat;
     }
 
     ~ShadowText() {
