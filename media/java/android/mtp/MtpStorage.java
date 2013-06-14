@@ -39,7 +39,7 @@ public class MtpStorage {
         mStorageId = volume.getStorageId();
         mPath = volume.getPath();
         mDescription = context.getResources().getString(volume.getDescriptionId());
-        mReserveSpace = volume.getMtpReserveSpace() * 1024L * 1024L;
+        mReserveSpace = volume.getMtpReserveSpace() * 1024 * 1024;
         mRemovable = volume.isRemovable();
         mMaxFileSize = volume.getMaxFileSize();
     }
