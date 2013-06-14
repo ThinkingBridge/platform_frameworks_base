@@ -3653,9 +3653,7 @@ final class ActivityStack {
         }
 
         if (activityRemoved) {
-            synchronized (mService) {
-                resumeTopActivityLocked(null);
-            }
+            resumeTopActivityLocked(null);
         }
 
         return res;
