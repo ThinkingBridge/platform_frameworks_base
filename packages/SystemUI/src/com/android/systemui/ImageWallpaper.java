@@ -637,10 +637,7 @@ public class ImageWallpaper extends WallpaperService {
     
             mEglConfig = chooseEglConfig();
             if (mEglConfig == null) {
-                //chooseEGLConfig fail since no egl render type EGL_OPENGL_ES2_BIT when disable gpu acceleration,
-                //should switch to SW canvas renderer without throwing exception in this case.
-                checkEglError();
-                return false;
+                throw new RuntimeException("eglConfig not initialized");
             }
             
             mEglContext = createContext(mEgl, mEglDisplay, mEglConfig);
@@ -654,11 +651,6 @@ public class ImageWallpaper extends WallpaperService {
                 Log.e(GL_LOG_TAG, "requested  texture size " +
                     frame.width() + "x" + frame.height() + " exceeds the support maximum of " +
                     maxSize[0] + "x" + maxSize[0]);
-                return false;
-            }
-
-            if(mEglContext == EGL10.EGL_NO_CONTEXT){
-                checkEglError();
                 return false;
             }
     
