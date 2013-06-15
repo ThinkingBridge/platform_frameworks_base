@@ -1059,7 +1059,7 @@ public class NavigationBarView extends LinearLayout {
         mMenuVisbility = Settings.System.getInt(resolver,
                 Settings.System.MENU_VISIBILITY, VISIBILITY_SYSTEM);
         mMenuArrowKeys = Settings.System.getBoolean(resolver,
-                Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS, true);
+                Settings.System.NAVIGATION_BAR_MENU_ARROW_KEYS, false);
         mCurrentUIMode = Settings.System.getInt(resolver,
                 Settings.System.CURRENT_UI_MODE,0);
         mLeftyMode = Settings.System.getBoolean(resolver,
