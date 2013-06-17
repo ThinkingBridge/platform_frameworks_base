@@ -100,7 +100,7 @@ public class Traffic extends TextView {
             public void handleMessage(Message msg) {
                 speed = (mTrafficStats.getTotalRxBytes() - totalRxBytes) / 1024 / 3;
                 totalRxBytes = mTrafficStats.getTotalRxBytes();
-                DecimalFormat DecimalFormatfnum = new DecimalFormat("##0.00");
+                DecimalFormat DecimalFormatfnum = new DecimalFormat("###0");
                 if (speed / 1024 >= 1) {
                     setText(DecimalFormatfnum.format(speed / 1024) + "MB/s");
                 } else if (speed <= 0.01) {
