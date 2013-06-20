@@ -20,8 +20,6 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 /**
  * Common base class of common implementation for an {@link Adapter} that can be
@@ -84,7 +82,4 @@ public abstract class BaseAdapter implements ListAdapter, SpinnerAdapter {
     public boolean isEmpty() {
         return getCount() == 0;
     }
-
-
-         
 }

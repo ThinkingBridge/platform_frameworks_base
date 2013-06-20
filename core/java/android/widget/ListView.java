@@ -45,8 +45,6 @@ import android.widget.RemoteViews.RemoteView;
 
 import java.util.ArrayList;
 
-import android.widget.BaseAdapter;
-
 /*
  * Implementation Notes:
  *
@@ -132,9 +130,6 @@ public class ListView extends AbsListView {
 
     // Keeps focused children visible through resizes
     private FocusSelector mFocusSelector;
-    
-    // for Start Animation
-    private int mAnimation;
 
     public ListView(Context context) {
         this(context, null);
@@ -460,9 +455,8 @@ public class ListView extends AbsListView {
 
         // AbsListView#setAdapter will update choice mode states.
         super.setAdapter(adapter);
-          
+
         if (mAdapter != null) {
-             
             mAreAllItemsSelectable = mAdapter.areAllItemsEnabled();
             mOldItemCount = mItemCount;
             mItemCount = mAdapter.getCount();
@@ -486,8 +480,6 @@ public class ListView extends AbsListView {
                 // Nothing selected
                 checkSelectionChanged();
             }
-           if(mAdapter instanceof BaseAdapter)
-           mAdapter = setAnimation((BaseAdapter)mAdapter);
         } else {
             mAreAllItemsSelectable = true;
             checkFocus();
@@ -498,34 +490,6 @@ public class ListView extends AbsListView {
         requestLayout();
     }
 
-    private ListAdapter setAnimation(BaseAdapter Badapter){
-     android.util.Log.e("Test","enable ANimation");
-     mAnimation = 1;
-     switch(mAnimation){
-         case 1:
-		     AlphaInAnimationAdapter AAdapter = new AlphaInAnimationAdapter(Badapter);
-		     AAdapter.setAbsListView(this);
-          return (ListAdapter)AAdapter;
-         case 2:
-		     ScaleInAnimationAdapter SAdapter = new ScaleInAnimationAdapter(Badapter);
-		     SAdapter.setAbsListView(this);
-          return (ListAdapter)SAdapter;
-         case 3:
-		     SwingBottomInAnimationAdapter S1Adapter = new SwingBottomInAnimationAdapter(Badapter);
-		     S1Adapter.setAbsListView(this);
-          return (ListAdapter)S1Adapter;
-         case 4:
-		     SwingLeftInAnimationAdapter S2Adapter = new SwingLeftInAnimationAdapter(Badapter);
-		     S2Adapter.setAbsListView(this);
-          return (ListAdapter)S2Adapter;
-         case 5:
-		     SwingRightInAnimationAdapter S3Adapter = new SwingRightInAnimationAdapter(Badapter);
-		     S3Adapter.setAbsListView(this);
-          return (ListAdapter)S3Adapter;
-      }
-
-     return (ListAdapter)Badapter;
-    }
 
     /**
      * The list is empty. Clear everything out.
