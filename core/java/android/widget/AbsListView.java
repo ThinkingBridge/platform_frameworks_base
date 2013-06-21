@@ -2239,10 +2239,10 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
                 anim = new AlphaAnimation(0.0f, 1.0f);
                 break;
             case 5:
-                anim = new TranslateAnimation(-mHeight, 0.0f, 0.0f, 0.0f);
+                anim = new TranslateAnimation(0.0f, 0.0f, -mHeight, 0.0f);
                 break;
             case 6:
-                anim = new TranslateAnimation(mHeight, 0.0f, 0.0f, 0.0f);
+                anim = new TranslateAnimation(0.0f, 0.0f, mHeight, 0.0f);
                 break;
             case 7:
                 anim = new TranslateAnimation(-mWidth, 0.0f, 0.0f, 0.0f);	
