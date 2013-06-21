@@ -695,7 +695,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      */
     boolean mIsScrolling;
     int mWidth, mHeight = 0;
-
+    int mvPosition;
     /**
      * Interface definition for a callback to be invoked when the list or grid
      * has been scrolled.
@@ -2214,12 +2214,20 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         return child;
     }
 
-    View setAnimation(View view){
+    View setAnimation(View view) {
         int mAnim = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
+        boolean mDown = false;
         if(mAnim == 0)
-        return view;
+            return view;
+        if(mvPosition == getFirstVisiblePosition()) {
+            return view;
+        } else {
+            if(mvPosition < getFirstVisiblePosition())
+            mDown = true;
+            mvPosition = getFirstVisiblePosition();
+        }
         Animation anim = null;
-        switch(mAnim){
+        switch (mAnim) {
             case 1:	
                 anim = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f);
                 break;
@@ -2239,9 +2247,21 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
                 anim = new TranslateAnimation(0.0f, 0.0f, mHeight, 0.0f);
                 break;
             case 7:
-                anim = new TranslateAnimation(-mWidth, 0.0f, 0.0f, 0.0f);	
+                if(mDown)
+                    anim = new TranslateAnimation(0.0f, 0.0f, -mHeight, 0.0f);
+                else
+                    anim = new TranslateAnimation(0.0f, 0.0f, mHeight, 0.0f);
                 break;
             case 8:
+                if(mDown)
+                    anim = new TranslateAnimation(0.0f, 0.0f, mHeight, 0.0f);
+                else
+                    anim = new TranslateAnimation(0.0f, 0.0f, -mHeight, 0.0f);
+                break;
+            case 9:
+                anim = new TranslateAnimation(-mWidth, 0.0f, 0.0f, 0.0f);	
+                break;
+            case 10:
                 anim = new TranslateAnimation(mWidth, 0.0f, 0.0f, 0.0f);	
                 break;
         }
