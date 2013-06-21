@@ -672,9 +672,6 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      */
     boolean mIsAttached;
 
-    
-
-
     /**
      * Track the item count from the last time we handled a data change.
      */
@@ -763,11 +760,11 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
          */
         public void adjustListItemSelectionBounds(Rect bounds);
     }
-    
+
     public AbsListView(Context context) {
         super(context);
         initAbsListView();
-        
+
         setVerticalScrollBarEnabled(true);
         TypedArray a = context.obtainStyledAttributes(R.styleable.View);
         initializeScrollbars(a);
@@ -840,10 +837,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
         mDensityScale = getContext().getResources().getDisplayMetrics().density;
 
-
         setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE|ViewGroup.PERSISTENT_SCROLLING_CACHE); ;
-
-
     }
 
     @Override
@@ -2214,7 +2208,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
             }
         }
 
-        if(mIsScrolling){
+        if(mIsScrolling) {
         child = setAnimation(child);
         }
         return child;
@@ -3943,7 +3937,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      *
      * @param newState The new scroll state.
      */
-    void reportScrollStateChange(int newState) {        
+    void reportScrollStateChange(int newState) {
         if (newState != mLastScrollState) {
             if(newState == OnScrollListener.SCROLL_STATE_IDLE) 
             mIsScrolling = false;
