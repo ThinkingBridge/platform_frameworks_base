@@ -74,6 +74,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.view.animation.Animation;  
+import android.view.animation.AlphaAnimation;  
 import android.view.animation.ScaleAnimation;  
 import android.view.animation.TranslateAnimation;  
 
@@ -696,7 +697,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      * for ListView Animations
      */
     boolean mIsScrolling;
-    int mWidth, mHeight;
+    int mWidth, mHeight = 0;
 
     /**
      * Interface definition for a callback to be invoked when the list or grid
@@ -842,8 +843,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
         setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE|ViewGroup.PERSISTENT_SCROLLING_CACHE); ;
 
-        mHeight = getContext().getResources().getDisplayMetrics().getHeight();
-        mWidth = getContext().getResources().getDisplayMetrics().getWidth();
+
     }
 
     @Override
@@ -2000,6 +2000,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+
         mInLayout = true;
         if (changed) {
             int childCount = getChildCount();
@@ -2017,6 +2018,8 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         mInLayout = false;
 
         mOverscrollMax = (b - t) / OVERSCROLL_LIMIT_DIVISOR;
+        mHeight = getHeight();
+        mWidth = getWidth();
     }
 
     /**
@@ -2218,8 +2221,10 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
     }
 
     View setAnimation(View view){
-        int mAnim = Settings.System.getInt(getActivity      ().getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
-        Animation anim = new Animation();
+        int mAnim = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
+        if(mAnim == 0)
+        return view;
+        Animation anim = null;
         switch(mAnim){
             case 1:	
                 anim = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f);
