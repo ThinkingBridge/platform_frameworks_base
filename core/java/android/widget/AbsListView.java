@@ -23,6 +23,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.provider.Settings;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
@@ -71,6 +72,10 @@ import com.android.internal.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.view.animation.Animation;  
+import android.view.animation.ScaleAnimation;  
+import android.view.animation.TranslateAnimation;  
 
 /**
  * Base class that can be used to implement virtualized lists of items. A list does
@@ -666,6 +671,9 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      */
     boolean mIsAttached;
 
+    
+
+
     /**
      * Track the item count from the last time we handled a data change.
      */
@@ -683,6 +691,12 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      * it.
      */
     private SavedState mPendingSync;
+
+    /**
+     * for ListView Animations
+     */
+    boolean mIsScrolling;
+    int mWidth, mHeight;
 
     /**
      * Interface definition for a callback to be invoked when the list or grid
@@ -748,11 +762,11 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
          */
         public void adjustListItemSelectionBounds(Rect bounds);
     }
-
+    
     public AbsListView(Context context) {
         super(context);
         initAbsListView();
-
+        
         setVerticalScrollBarEnabled(true);
         TypedArray a = context.obtainStyledAttributes(R.styleable.View);
         initializeScrollbars(a);
@@ -824,6 +838,12 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         mOverflingDistance = configuration.getScaledOverflingDistance();
 
         mDensityScale = getContext().getResources().getDisplayMetrics().density;
+
+
+        setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE|ViewGroup.PERSISTENT_SCROLLING_CACHE); ;
+
+        mHeight = getContext().getResources().getDisplayMetrics().getHeight();
+        mWidth = getContext().getResources().getDisplayMetrics().getWidth();
     }
 
     @Override
@@ -2143,7 +2163,6 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         View child;
         if (scrapView != null) {
             child = mAdapter.getView(position, scrapView, this);
-
             if (child.getImportantForAccessibility() == IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
                 child.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
             }
@@ -2192,7 +2211,44 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
             }
         }
 
+        if(mIsScrolling){
+        child = setAnimation(child);
+        }
         return child;
+    }
+
+    View setAnimation(View view){
+        int mAnim = Settings.System.getInt(getActivity      ().getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
+        Animation anim = new Animation();
+        switch(mAnim){
+            case 1:	
+                anim = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f);
+                break;
+            case 2:
+                anim = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f, Animation.RELATIVE_TO_SELF,1.0f, Animation.RELATIVE_TO_SELF, 1.0f);
+                break;
+            case 3:
+                anim = new ScaleAnimation(0.5f, 1.0f, 0.5f, 1.0f, Animation.RELATIVE_TO_SELF,0.5f, Animation.RELATIVE_TO_SELF, 0.5f);	
+                break;
+            case 4:
+                anim = new AlphaAnimation(0.0f, 1.0f);
+                break;
+            case 5:
+                anim = new TranslateAnimation(-mHeight, 0.0f, 0.0f, 0.0f);
+                break;
+            case 6:
+                anim = new TranslateAnimation(mHeight, 0.0f, 0.0f, 0.0f);
+                break;
+            case 7:
+                anim = new TranslateAnimation(-mWidth, 0.0f, 0.0f, 0.0f);	
+                break;
+            case 8:
+                anim = new TranslateAnimation(mWidth, 0.0f, 0.0f, 0.0f);	
+                break;
+        }
+        anim.setDuration(500);
+        view.startAnimation(anim);
+        return view;
     }
 
     class ListItemAccessibilityDelegate extends AccessibilityDelegate {
@@ -3882,8 +3938,12 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
      *
      * @param newState The new scroll state.
      */
-    void reportScrollStateChange(int newState) {
+    void reportScrollStateChange(int newState) {        
         if (newState != mLastScrollState) {
+            if(newState == OnScrollListener.SCROLL_STATE_IDLE) 
+            mIsScrolling = false;
+            else
+            mIsScrolling = true;              
             if (mOnScrollListener != null) {
                 mLastScrollState = newState;
                 mOnScrollListener.onScrollStateChanged(this, newState);
