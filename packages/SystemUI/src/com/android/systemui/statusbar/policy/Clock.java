@@ -355,7 +355,7 @@ public class Clock extends TextView {
              }
         };
         Timer timer = new Timer();
-        timer.schedule(second, 0, 1000); 
+        timer.schedule(second, 0, 1001); 
 
         mClockStyle = Settings.System.getInt(resolver,
                 Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_RIGHT);
