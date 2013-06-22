@@ -72,6 +72,7 @@ import com.android.internal.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.NullPointerException;
 
 import android.view.animation.Animation;  
 import android.view.animation.AlphaAnimation;  
@@ -2220,16 +2221,24 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
     View setAnimation(View view) {
         int mAnim = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
+        int scrollY = 0;
+
+        try {
+        	scrollY = getChildAt(0).getTop();
+        } catch (NullPointerException e) {
+        	scrollY = mvPosition;
+        }
+
         boolean mDown = false;
         if(mAnim == 0)
             return view;
-        if(!mIsGridView){
-        if(mvPosition == getFirstVisiblePosition()) {
+        if(!mIsGridView) {
+        if(mvPosition == scrollY) {
             return view;
         } else {
-            if(mvPosition < getFirstVisiblePosition())
+            if(mvPosition > scrollY)
             mDown = true;
-            mvPosition = getFirstVisiblePosition();
+            mvPosition = scrollY;
         }
         }
         Animation anim = null;
