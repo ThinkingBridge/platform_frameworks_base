@@ -697,6 +697,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
     boolean mIsScrolling;
     int mWidth, mHeight = 0;
     int mvPosition;
+    boolean mIsGridView = false;
     /**
      * Interface definition for a callback to be invoked when the list or grid
      * has been scrolled.
@@ -2161,6 +2162,11 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         View child;
         if (scrapView != null) {
             child = mAdapter.getView(position, scrapView, this);
+
+            if(mIsScrolling) {
+                child = setAnimation(child);
+            }
+
             if (child.getImportantForAccessibility() == IMPORTANT_FOR_ACCESSIBILITY_AUTO) {
                 child.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
             }
@@ -2209,9 +2215,6 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
             }
         }
 
-        if(mIsScrolling) {
-        child = setAnimation(child);
-        }
         return child;
     }
 
@@ -2220,12 +2223,14 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         boolean mDown = false;
         if(mAnim == 0)
             return view;
+        if(!mIsGridView){
         if(mvPosition == getFirstVisiblePosition()) {
             return view;
         } else {
             if(mvPosition < getFirstVisiblePosition())
             mDown = true;
             mvPosition = getFirstVisiblePosition();
+        }
         }
         Animation anim = null;
         switch (mAnim) {
@@ -2295,7 +2300,9 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         return view;
     }
  
-    
+    public void setGridView(boolean bool){
+    mIsGridView = bool;
+    }
 
     class ListItemAccessibilityDelegate extends AccessibilityDelegate {
         @Override
