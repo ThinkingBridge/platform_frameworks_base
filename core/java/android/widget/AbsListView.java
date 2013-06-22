@@ -2220,16 +2220,17 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
     View setAnimation(View view) {
         int mAnim = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
+        int scrollY = getChildAt(0).getTop();
         boolean mDown = false;
         if(mAnim == 0)
             return view;
         if(!mIsGridView){
-        if(mvPosition == getFirstVisiblePosition()) {
+        if(mvPosition == scrollY) {
             return view;
         } else {
-            if(mvPosition < getFirstVisiblePosition())
+            if(mvPosition < scrollY)
             mDown = true;
-            mvPosition = getFirstVisiblePosition();
+            mvPosition = scrollY;
         }
         }
         Animation anim = null;
