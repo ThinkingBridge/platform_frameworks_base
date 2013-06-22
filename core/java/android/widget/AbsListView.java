@@ -79,6 +79,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;  
 import android.view.animation.AnimationUtils;
 
+import java.lang.NullPointerException;
+
 /**
  * Base class that can be used to implement virtualized lists of items. A list does
  * not have a spatial definition here. For instance, subclases of this class can
@@ -2220,15 +2222,22 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
     View setAnimation(View view) {
         int mAnim = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_ANIMATION, 1);
-        int scrollY = getChildAt(0).getTop();
+        int scrollY = 0;
+
+        try {
+            scrollY = getChildAt(0).getTop();
+        } catch (NullPointerException e){
+            scrollY = mvPosition;
+        }
+
         boolean mDown = false;
         if(mAnim == 0)
             return view;
-        if(!mIsGridView){
+        if(!mIsGridView) {
         if(mvPosition == scrollY) {
             return view;
         } else {
-            if(mvPosition < scrollY)
+            if(mvPosition > scrollY)
             mDown = true;
             mvPosition = scrollY;
         }
