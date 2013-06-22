@@ -2270,25 +2270,25 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         int mInterpolator = Settings.System.getInt(mContext.getContentResolver(),Settings.System.LISTVIEW_INTERPOLATOR, 0);
         switch (mInterpolator) {
             case 1:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.accelerate_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.accelerate_interpolator));
                 break;
             case 2:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.decelerate_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.decelerate_interpolator));
                 break;
             case 3:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.accelerate_decelerate_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.accelerate_decelerate_interpolator));
                 break;
             case 4:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.anticipate_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.anticipate_interpolator));
                 break;
             case 5:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.overshoot_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.overshoot_interpolator));
                 break;
             case 6:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.anticipate_overshoot_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.anticipate_overshoot_interpolator));
                 break;
             case 7:
-                anim.setInterpolator(loadInterpolator(this, android.R.anim.bounce_interpolator);
+                anim.setInterpolator(AnimationUtils.loadInterpolator(mContext, android.R.anim.bounce_interpolator));
                 break;
         }      
         view.startAnimation(anim);
