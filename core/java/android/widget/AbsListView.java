@@ -1,4 +1,4 @@
-/*
+cd/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -2224,9 +2224,9 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         int scrollY = 0;
 
         try {
-        	scrollY = computeVerticalScrollOffset();
+            scrollY = computeVerticalScrollOffset();
         } catch (NullPointerException e) {
-        	scrollY = mvPosition;
+            scrollY = mvPosition;
         }
 
         boolean mDown = false;
@@ -2236,7 +2236,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         if(mvPosition == scrollY) {
             return view;
         } else {
-            if(mvPosition > scrollY)
+            if(mvPosition < scrollY)
             mDown = true;
             mvPosition = scrollY;
         }
