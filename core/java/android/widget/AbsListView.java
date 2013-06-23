@@ -2235,12 +2235,13 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         if(!mIsGridView) {
         if(mvPosition == scrollY) {
             return view;
-        } else {
-            if(mvPosition < scrollY)
-            mDown = true;
-            mvPosition = scrollY;
+        } 
         }
-        }
+        mvPosition = scrollY;
+
+        if(mvPosition < scrollY)
+        mDown = true;
+
         Animation anim = null;
         switch (mAnim) {
             case 1:	
