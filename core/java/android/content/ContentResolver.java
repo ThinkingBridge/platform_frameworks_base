@@ -518,7 +518,7 @@ public abstract class ContentResolver {
      * ContentProvider.openFile}.
      * @return Returns a new ParcelFileDescriptor pointing to the file.  You
      * own this descriptor and are responsible for closing it when done.
-     * @throws FileNotFoundException Throws FileNotFoundException if no
+     * @throws FileNotFoundException Throws FileNotFoundException of no
      * file exists under the URI or the mode is invalid.
      * @see #openAssetFileDescriptor(Uri, String)
      */
@@ -1049,9 +1049,9 @@ public abstract class ContentResolver {
         if (!SCHEME_CONTENT.equals(uri.getScheme())) {
             return null;
         }
-        final String auth = uri.getAuthority();
+        String auth = uri.getAuthority();
         if (auth != null) {
-            return acquireProvider(mContext, auth);
+            return acquireProvider(mContext, uri.getAuthority());
         }
         return null;
     }
@@ -1068,9 +1068,9 @@ public abstract class ContentResolver {
         if (!SCHEME_CONTENT.equals(uri.getScheme())) {
             return null;
         }
-        final String auth = uri.getAuthority();
+        String auth = uri.getAuthority();
         if (auth != null) {
-            return acquireExistingProvider(mContext, auth);
+            return acquireExistingProvider(mContext, uri.getAuthority());
         }
         return null;
     }

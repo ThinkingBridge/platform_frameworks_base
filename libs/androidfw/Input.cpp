@@ -221,7 +221,7 @@ status_t PointerCoords::readFromParcel(Parcel* parcel) {
     }
 
     for (uint32_t i = 0; i < count; i++) {
-        values[i] = parcel->readFloat();
+        values[i] = parcel->readInt32();
     }
     return OK;
 }
@@ -231,7 +231,7 @@ status_t PointerCoords::writeToParcel(Parcel* parcel) const {
 
     uint32_t count = __builtin_popcountll(bits);
     for (uint32_t i = 0; i < count; i++) {
-        parcel->writeFloat(values[i]);
+        parcel->writeInt32(values[i]);
     }
     return OK;
 }

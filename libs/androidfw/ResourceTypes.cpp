@@ -5115,7 +5115,6 @@ status_t ResTable::parsePackage(const ResTable_package* const pkg,
         }
         err = group->packages.add(package);
         if (err < NO_ERROR) {
-            delete group;
             delete package;
             return (mError=err);
         }
@@ -5708,13 +5707,13 @@ void ResTable::print(bool inclValues) const
                         
                         uint16_t esize = dtohs(ent->size);
                         if ((esize&0x3) != 0) {
-                            printf("NON-INTEGER ResTable_entry SIZE: 0x%x\n", esize);
+                            printf("NON-INTEGER ResTable_entry SIZE: %p\n", (void*)esize);
                             continue;
                         }
                         if ((thisOffset+esize) > typeSize) {
-                            printf("ResTable_entry OUT OF BOUNDS: %p+%p+0x%x (size is %p)\n",
+                            printf("ResTable_entry OUT OF BOUNDS: %p+%p+%p (size is %p)\n",
                                    (void*)entriesStart, (void*)thisOffset,
-                                   esize, (void*)typeSize);
+                                   (void*)esize, (void*)typeSize);
                             continue;
                         }
                             

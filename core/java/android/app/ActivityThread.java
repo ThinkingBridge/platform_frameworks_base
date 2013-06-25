@@ -4673,8 +4673,6 @@ public final class ActivityThread {
                                 + "snatched provider from the jaws of death");
                     }
                     prc.removePending = false;
-                    // There is a race! It fails to remove the message, which
-                    // will be handled in completeRemoveProvider().
                     mH.removeMessages(H.REMOVE_PROVIDER, prc);
                 } else {
                     unstableDelta = 0;
@@ -4854,11 +4852,6 @@ public final class ActivityThread {
                 return;
             }
 
-            // More complicated race!! Some client managed to acquire the
-            // provider and release it before the removal was completed.
-            // Continue the removal, and abort the next remove message.
-            prc.removePending = false;
-
             final IBinder jBinder = prc.holder.provider.asBinder();
             ProviderRefCount existingPrc = mProviderRefCountMap.get(jBinder);
             if (existingPrc == prc) {
@@ -4873,17 +4866,17 @@ public final class ActivityThread {
                     iter.remove();
                 }
             }
+        }
 
-            try {
-                if (DEBUG_PROVIDER) {
-                    Slog.v(TAG, "removeProvider: Invoking ActivityManagerNative."
-                            + "removeContentProvider(" + prc.holder.info.name + ")");
-                }
-                ActivityManagerNative.getDefault().removeContentProvider(
-                        prc.holder.connection, false);
-            } catch (RemoteException e) {
-                //do nothing content provider object is dead any way
+        try {
+            if (DEBUG_PROVIDER) {
+                Slog.v(TAG, "removeProvider: Invoking ActivityManagerNative."
+                        + "removeContentProvider(" + prc.holder.info.name + ")");
             }
+            ActivityManagerNative.getDefault().removeContentProvider(
+                    prc.holder.connection, false);
+        } catch (RemoteException e) {
+            //do nothing content provider object is dead any way
         }
     }
 

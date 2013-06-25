@@ -84,8 +84,8 @@ public class StatusBarIconView extends AnimatedImageView {
             final float scale = (float)imageBounds / (float)outerBounds;
             setScaleX(scale);
             setScaleY(scale);
-            setAlpha(Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.STATUS_BAR_NOTIF_ICON_OPACITY, 140));
+            final float alpha = res.getFraction(R.dimen.status_bar_icon_drawing_alpha, 1, 1);
+            setAlpha(alpha);
         }
 
         setScaleType(ImageView.ScaleType.CENTER);
@@ -99,8 +99,8 @@ public class StatusBarIconView extends AnimatedImageView {
         final float scale = (float)imageBounds / (float)outerBounds;
         setScaleX(scale);
         setScaleY(scale);
-        setAlpha(Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_NOTIF_ICON_OPACITY, 140));
+        final float alpha = res.getFraction(R.dimen.status_bar_icon_drawing_alpha, 1, 1);
+        setAlpha(alpha);
     }
 
     private static boolean streq(String a, String b) {
@@ -335,9 +335,6 @@ public class StatusBarIconView extends AnimatedImageView {
         }
         @Override
         public void onChange(boolean selfChange) {
-            setAlpha(Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.STATUS_BAR_NOTIF_ICON_OPACITY, 140));
-
             mShowNotificationCount = Settings.System.getInt(
                     mContext.getContentResolver(),
                     Settings.System.STATUS_BAR_NOTIF_COUNT, 0) == 1;
