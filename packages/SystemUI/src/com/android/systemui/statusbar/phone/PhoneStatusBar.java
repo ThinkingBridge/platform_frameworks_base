@@ -468,6 +468,11 @@ public class PhoneStatusBar extends BaseStatusBar {
                     Settings.System.RIBBON_TEXT_COLOR[AokpRibbonHelper.QUICK_SETTINGS]), false, this);
             update();
         }
+        
+        @Override
+        public void onChange(boolean selfChange) {
+            update();
+        }
 
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
