@@ -3,14 +3,17 @@ package com.android.systemui.statusbar.toggles;
 
 import android.app.ActivityManagerNative;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -23,6 +26,7 @@ import com.android.systemui.R;
 import com.android.systemui.statusbar.phone.QuickSettingsTileView;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public abstract class BaseToggle
         implements OnClickListener, OnLongClickListener {
@@ -43,6 +47,10 @@ public abstract class BaseToggle
     protected ImageView mIcon = null;
     private int mIconId = -1;
 
+    int mTextColor;
+
+    private SettingsObserver mObserver = null;
+
     protected ArrayList<BroadcastReceiver> mRegisteredReceivers = new ArrayList<BroadcastReceiver>();
 
     protected Handler mHandler;
@@ -60,8 +68,15 @@ public abstract class BaseToggle
         mContext = c;
         mStyle = style;
         mHandler = new Handler();
+        mObserver = new SettingsObserver(mHandler);
+        mObserver.observe();
         setTextSize(ToggleManager.getTextSize(mContext));
+        setTextColor(mTextColor);
         scheduleViewUpdate();
+    }
+
+    protected final void setTextColor(int cl) {
+        mTextColor = cl;
     }
 
     protected final void setTextSize(int s) {
@@ -193,6 +208,7 @@ public abstract class BaseToggle
 
             if (mLabel != null) {
                 mLabel.setText(mLabelText);
+                mLabel.setTextColor(mTextColor);
                 mLabel.setVisibility(View.VISIBLE);
                 // if (mIconDrawable != null) {
                 // mLabel.setCompoundDrawablesWithIntrinsicBounds(null,
@@ -258,5 +274,32 @@ public abstract class BaseToggle
 
     protected static void log(String msg, Exception e) {
         ToggleManager.log(msg, e);
+    }
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver cr = mContext.getContentResolver();
+
+            cr.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QUICK_SETTINGS_TEXT_COLOR), false, this);
+
+            updateSettings();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
+    private void updateSettings() {
+        ContentResolver resolver = mContext.getContentResolver();
+
+        mTextColor = Settings.System.getInt(resolver,
+                Settings.System.QUICK_SETTINGS_TEXT_COLOR, 0xFFFFFFFF);
     }
 }
