@@ -811,9 +811,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         mMemoryBar = (ProgressBar) findViewById(R.id.recents_memory_bar);
         ViewGroup scrollView = (ViewGroup) findViewById(R.id.recents_container);
 
-        mMemoryUsedText.setVisibility(View.VISIBLE);
-        mMemoryAvailText.setVisibility(View.VISIBLE);
-        mMemoryBar.setVisibility(View.VISIBLE);
+        removeView(mMemoryUsedText);
+        removeView(mMemoryAvailText);
+        removeView(mMemoryBar);
 
         this.updateMemDisplay();
 

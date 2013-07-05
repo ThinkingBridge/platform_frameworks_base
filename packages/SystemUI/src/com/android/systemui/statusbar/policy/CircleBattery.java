@@ -238,9 +238,7 @@ public class CircleBattery extends ImageView {
 
         batteryStyle = (Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.STATUSBAR_BATTERY_ICON, 0));
-
         mObserver = new SettingsObserver(mHandler);
-
         mBatteryReceiver = new BatteryReceiver(mContext);
 
         initializeCircleVars();
