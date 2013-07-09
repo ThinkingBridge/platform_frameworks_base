@@ -169,16 +169,11 @@ public class Halo extends FrameLayout implements Ticker.TickerCallback {
     private int oldIconIndex = -1;
     private float initialX = 0;
     private float initialY = 0;
-<<<<<<< HEAD
-=======
-    private boolean hiddenState = false;
     
     // Halo dock position
     SharedPreferences preferences;
     private String KEY_HALO_POSITION_Y = "halo_position_y";
     private String KEY_HALO_POSITION_X = "halo_position_x";
-
->>>>>>> cec2425... HALO: halo can save last position now
 
     private final class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
