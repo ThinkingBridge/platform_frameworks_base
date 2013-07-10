@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.view.MotionEvent;
@@ -190,6 +192,7 @@ public class RecentsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.status_bar_recent_panel);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mRecentsPanel = (RecentsPanelView) findViewById(R.id.recents_root);
         mRecentsPanel.setOnTouchListener(new TouchOutsideListener(mRecentsPanel));
 

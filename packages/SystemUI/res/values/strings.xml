@@ -636,5 +636,9 @@
     <string name="pie_hour_format_12">hh:mm</string>
     <string name="pie_hour_format_24">HH:mm</string>
     <string name="pie_am_pm">a</string>
+    
+    <!-- Multitask panel -->
+    <string name="recent_apps_title">Recent apps</string>
+    <string name="avail">Available</string>
 
 </resources>

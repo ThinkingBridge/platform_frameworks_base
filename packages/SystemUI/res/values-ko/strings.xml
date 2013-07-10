@@ -276,5 +276,9 @@
     <string name="brightness_label">밝기</string>
 
     <string name="pie_date_format">ccc,yyyy MMM dd</string>
+    
+    <!-- Multitask panel -->
+    <string name="recent_apps_title">최근 앱</string>
+    <string name="avail">의 여유 메모리</string>
  
 </resources>
