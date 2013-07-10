@@ -20,7 +20,6 @@ import android.animation.Animator;
 import android.animation.LayoutTransition;
 import android.animation.TimeInterpolator;
 import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
 import android.app.TaskStackBuilder;
@@ -64,10 +63,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.internal.util.MemInfoReader;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
@@ -75,11 +72,6 @@ import com.android.systemui.statusbar.tablet.StatusBarPanel;
 import com.android.systemui.statusbar.tablet.TabletStatusBar;
 
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 public class RecentsPanelView extends FrameLayout implements OnItemClickListener, RecentsCallback,
         StatusBarPanel, Animator.AnimatorListener {
@@ -107,11 +99,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private boolean mHighEndGfx;
     private ImageView mClearRecents;
     Context context;
-    
-    private MemInfoReader mMemInfoReader = new MemInfoReader();
-    private TextView mMemoryUsedText;
-    private TextView mMemoryAvailText;
-    private ProgressBar mMemoryBar;
 
     public static interface RecentsScrollView {
         public int numItemsInOneScreenful();
@@ -351,7 +338,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             setFocusable(true);
             setFocusableInTouchMode(true);
             requestFocus();
-            showMemDisplay();
         } else {
             mWaitingToShow = false;
             // call onAnimationEnd() and clearRecentTasksList() in onUiHidden()
@@ -504,7 +490,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             // Should remove the default image in the frame
             // that this now covers, to improve scrolling speed.
             // That can't be done until the anim is complete though.
-        	final int reflectionGap = 4;
+            final int reflectionGap = 4;
             int width = thumbnail.getWidth();
             int height = thumbnail.getHeight();
 
@@ -770,7 +756,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
             setContentDescription(null);
         }
-        updateMemDisplay();
     }
 
     private void startApplicationDetailsActivity(String packageName) {
@@ -823,39 +808,5 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         });
         popup.show();
     }
-
-    private boolean showMemDisplay() {
-
-        mMemoryUsedText = (TextView) findViewById(R.id.recents_memory_used_text);
-        mMemoryAvailText = (TextView) findViewById(R.id.recents_memory_avail_text);
-        mMemoryBar = (ProgressBar) findViewById(R.id.recents_memory_bar);
-        ViewGroup scrollView = (ViewGroup) findViewById(R.id.recents_container);
-
-        removeView(mMemoryUsedText);
-        removeView(mMemoryAvailText);
-        removeView(mMemoryBar);
-
-        this.updateMemDisplay();
-
-        return true;
-    }
-
-    void updateMemDisplay() {
-        mMemInfoReader.readMemInfo();
-        ActivityManager.MemoryInfo memInfo = new ActivityManager.MemoryInfo();
-        
-        int availMem = (int)((mMemInfoReader.getFreeSize() + mMemInfoReader.getCachedSize()
-            - memInfo.secondaryServerThreshold) / 1048576); // = 1024*1024
-        if (availMem < 0) {
-            availMem = 0;
-        }
-
-        int totalMem = (int)(mMemInfoReader.getTotalSize() / 1048576); // = 1024*1024;
-        int usedMem = totalMem - availMem;
-        mMemoryBar.setMax(totalMem);
-        mMemoryUsedText.setText("Used: " + usedMem + "MB");
-        mMemoryAvailText.setText("Free: " + availMem + "MB");
-        mMemoryBar.setProgress(usedMem);
-    }    
 
 }

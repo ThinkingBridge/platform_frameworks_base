@@ -64,41 +64,27 @@
 
         </com.android.systemui.recent.RecentsHorizontalScrollView>
         
-        <TextView
-            android:id="@+id/app_tile_title"
-            android:textSize="20.0dip"
-            android:textColor="#ffe5e5e5"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="45.0dip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/recent_apps_title" />
-        
-        <TextView 
-            android:id="@+id/recents_memory_text"
-            android:textSize="20.0dip"
-            android:textColor="#ffe5e5e5"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="65.0dip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <ProgressBar android:id="@+id/recents_memory_bar"
-                  style="?android:attr/progressBarStyleHorizontal"
-                  android:layout_height="wrap_content"
-                  android:layout_width="match_parent"
-                  android:layout_gravity="top|left"
-                  android:layout_marginTop="5dp"
-                  android:layout_marginRight="5dp" />
-
-        <ImageView
-            android:id="@+id/recents_clear"
-            android:clickable="true"
+        <FrameLayout
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:scaleType="center"
-            android:layout_gravity="bottom|center"
-            android:src="@drawable/ic_notify_clear_pressed" />
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_gravity="bottom|center" >
+
+            <com.android.systemui.recent.CircleMemory
+                android:id="@+id/circle_meter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/recents_clear"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_notify_clear_pressed" />
+
+        </FrameLayout>
             
         <HorizontalScrollView 
             android:id="@+id/appView"

@@ -112,13 +112,7 @@ public class RecentsActivity extends Activity {
     }
 
     private void updateWallpaperVisibility(boolean visible) {
-        int wpflags = visible ? WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER : 0;
-        int curflags = getWindow().getAttributes().flags
-                & WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
-        if (wpflags != curflags) {
-            getWindow().setFlags(wpflags, WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
-        }
-    }
+    	}
 
     public static boolean forceOpaqueBackground(Context context) {
         return WallpaperManager.getInstance(context).getWallpaperInfo() != null;
@@ -192,7 +186,6 @@ public class RecentsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.status_bar_recent_panel);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mRecentsPanel = (RecentsPanelView) findViewById(R.id.recents_root);
         mRecentsPanel.setOnTouchListener(new TouchOutsideListener(mRecentsPanel));
 

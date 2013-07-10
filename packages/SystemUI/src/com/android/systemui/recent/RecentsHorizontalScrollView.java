@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
@@ -201,6 +202,14 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                        	int[] lo = new int[2];
+                        	child.getLocationOnScreen(lo);
+                        	int psX = lo[0];
+                        	int halfWidth = (int) (child.getWidth() * 0.5f);
+                        	int screenWith = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
+                        	int halfScreenWidth = (int) (screenWith * 0.5f);
+                        	final int scroll = posX + halfWidth - halfScreenWidth;
+                        	smoothScrollBy(scroll, 0);
                             dismissChild(child);
                         }
                     });
