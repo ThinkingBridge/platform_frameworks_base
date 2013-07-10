@@ -53,15 +53,15 @@ public class CircleMemory extends ImageView {
         }
     };
 
-    public CircleMemoryMeter(Context context) {
+    public CircleMemory(Context context) {
         this(context, null);
     }
 
-    public CircleMemoryMeter(Context context, AttributeSet attrs) {
+    public CircleMemory(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CircleMemoryMeter(Context context, AttributeSet attrs, int defStyle) {
+    public CircleMemory(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         mContext = context;

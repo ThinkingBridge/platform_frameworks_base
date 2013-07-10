@@ -204,7 +204,7 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
                         public void run() {
                         	int[] lo = new int[2];
                         	child.getLocationOnScreen(lo);
-                        	int psX = lo[0];
+                        	int posX = lo[0];
                         	int halfWidth = (int) (child.getWidth() * 0.5f);
                         	int screenWith = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
                         	int halfScreenWidth = (int) (screenWith * 0.5f);
