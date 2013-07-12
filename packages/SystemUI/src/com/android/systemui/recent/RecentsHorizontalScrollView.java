@@ -54,8 +54,6 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     private RecentsScrollViewPerformanceHelper mPerformanceHelper;
     private HashSet<View> mRecycledViews;
     private int mNumItemsInOneScreenful;
-    
-    private Handler mHandler;
 
     public RecentsHorizontalScrollView(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
@@ -64,8 +62,6 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
         mSwipeHelper = new SwipeHelper(SwipeHelper.Y, this, densityScale, pagingTouchSlop);
         mPerformanceHelper = RecentsScrollViewPerformanceHelper.create(context, attrs, this, false);
         mRecycledViews = new HashSet<View>();
-        
-        mHandler = new Handler();
     }
 
     public void setMinSwipeAlpha(float minAlpha) {
@@ -181,46 +177,20 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     public void removeViewInLayout(final View view) {
         dismissChild(view);
     }
-    
+
     @Override
     public void removeAllViewsInLayout() {
         smoothScrollTo(0, 0);
-        Thread clearAll = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                int count = mLinearLayout.getChildCount();
-                if (!RecentsActivity.mHomeForeground) {
-                    count--;
+        int count = mLinearLayout.getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = mLinearLayout.getChildAt(i);
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    dismissChild(child);
                 }
-                
-                View[] refView = new View[count];
-                for (int i = 0; i < count; i++) {
-                    refView[i] = mLinearLayout.getChildAt(i);
-                }
-                for (int i = 0; i < count; i++) {
-                    final View child = refView[i];
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                        	int[] lo = new int[2];
-                        	child.getLocationOnScreen(lo);
-                        	int posX = lo[0];
-                        	int halfWidth = (int) (child.getWidth() * 0.5f);
-                        	int screenWith = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getWidth();
-                        	int halfScreenWidth = (int) (screenWith * 0.5f);
-                        	final int scroll = posX + halfWidth - halfScreenWidth;
-                        	smoothScrollBy(scroll, 0);
-                            dismissChild(child);
-                        }
-                    });
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-        });
-        clearAll.start();
+            }, i * 150);
+        }
     }
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {

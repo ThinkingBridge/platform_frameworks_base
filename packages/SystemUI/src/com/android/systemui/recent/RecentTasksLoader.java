@@ -379,7 +379,6 @@ public class RecentTasksLoader implements View.OnTouchListener {
 
             // Don't load the current home activity.
             if (isCurrentHomeActivity(intent.getComponent(), null)) {
-            	RecentsActivity.mHomeForeground = true;
                 return null;
             }
 
