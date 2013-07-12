@@ -2814,10 +2814,16 @@ public final class Settings {
         public static final String STATUS_BAR_CLOCK = "status_bar_clock";
         
         /**
-         * Network speed indicator
+         * StatusBar Network speed indicator
          * @hide
          */
         public static final String STATUS_BAR_TRAFFIC = "status_bar_traffic";
+        
+        /**
+         * StatusBar Network speed indicator color
+         * @hide
+         */
+        public static final String STATUS_BAR_TRAFFIC_COLOR = "status_bar_traffic_color";
 
         /**
          * Whether to show the signal text or signal bars.
