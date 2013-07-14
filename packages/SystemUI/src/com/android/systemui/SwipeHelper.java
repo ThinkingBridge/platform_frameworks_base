@@ -32,8 +32,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.animation.Animation;
-import android.view.animation.Rotate3dAnimation;
 
 public class SwipeHelper implements Gefingerpoken {
     static final String TAG = "com.android.systemui.SwipeHelper";
@@ -107,7 +105,7 @@ public class SwipeHelper implements Gefingerpoken {
         return mSwipeDirection == X ? ev.getX() : ev.getY();
     }
 
-    public float getTranslation(View v) {
+    private float getTranslation(View v) {
         return mSwipeDirection == X ? v.getTranslationX() : v.getTranslationY();
     }
 
@@ -393,7 +391,6 @@ public class SwipeHelper implements Gefingerpoken {
                         // snappity
                         mCallback.onDragCancelled(mCurrView);
                         snapChild(mCurrView, velocity);
- 
                     }
                 }
                 break;

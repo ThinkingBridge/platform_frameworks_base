@@ -27,7 +27,6 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.FloatMath;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -73,21 +72,19 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
         mSwipeHelper = new SwipeHelper(SwipeHelper.Y, this, densityScale, pagingTouchSlop);
         mPerformanceHelper = RecentsScrollViewPerformanceHelper.create(context, attrs, this, false);
         mRecycledViews = new HashSet<View>();
-        
-        mHandler = new Handler();
+	mHandler = new Handler();
 	rotate.sendEmptyMessage(0);
     }
 
     final Handler rotate = new Handler() {
 	public void handleMessage(Message msg) {
 	    float Delta = mPX - getScrollX();
-	    android.util.Log.e("test",Delta+"");
-            if(!isTouching && Delta < getWidth()/500 && Delta > -getWidth()/500){
+            if(!isTouching && Delta == 0) {
                 setRotationYAll(2);
-	    }else if(Delta < 0){
-		setRotationYAll(1);	
-            }else if(Delta > 0){
-		setRotationYAll(0);	
+	         } else if(Delta < 0) {
+						setRotationYAll(1);	
+            } else if(Delta > 0) {
+						setRotationYAll(0);	
             }
 	    mPX = getScrollX();
 	    rotate.sendEmptyMessageDelayed(0,150);
@@ -261,9 +258,9 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if(ev.getAction() == MotionEvent.ACTION_UP||ev.getAction() == MotionEvent.ACTION_CANCEL)
-         	isTouching = false;
+            isTouching = false;
         else
-		isTouching = true;
+		       isTouching = true;
         return mSwipeHelper.onTouchEvent(ev) ||
             super.onTouchEvent(ev);
     }
