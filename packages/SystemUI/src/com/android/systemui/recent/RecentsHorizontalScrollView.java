@@ -27,6 +27,7 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -80,7 +81,7 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
 	public void handleMessage(Message msg) {
 	    float Delta = mPX - getScrollX();
             if(!isTouching && Delta == 0) {
-                setRotationYAll(2);
+                	setRotationYAll(2);
 	         } else if(Delta < 0) {
 						setRotationYAll(1);	
             } else if(Delta > 0) {
@@ -182,6 +183,7 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
             final View appTitle = view.findViewById(R.id.app_label);
             appTitle.setContentDescription(" ");
             appTitle.setOnTouchListener(noOpListener);
+            view.setRotationY(0.0f);
             mLinearLayout.addView(view);
             mViews.add(view);
         }
@@ -464,14 +466,14 @@ public class RecentsHorizontalScrollView extends HorizontalScrollView
     switch(mode){
     	case 0:
     		for(int i = 0;i < mViews.size();i++) {
-    		ObjectAnimator rotate = ObjectAnimator.ofFloat(mViews.get(i), "rotationY", mViews.get(i).getRotationY(), -30.0f);
+    		ObjectAnimator rotate = ObjectAnimator.ofFloat(mViews.get(i), "rotationY", mViews.get(i).getRotationY(), -25.0f);
         	rotate.setDuration(150);
     		rotate.start();
 		}
 		break;
 	case 1:
    		for(int i = 0;i < mViews.size();i++) {
-    		ObjectAnimator rotate = ObjectAnimator.ofFloat(mViews.get(i), "rotationY", mViews.get(i).getRotationY(), 30.0f);
+    		ObjectAnimator rotate = ObjectAnimator.ofFloat(mViews.get(i), "rotationY", mViews.get(i).getRotationY(), 25.0f);
         	rotate.setDuration(150);
     		rotate.start();
 		}
