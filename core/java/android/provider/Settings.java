@@ -2629,6 +2629,13 @@ public final class Settings {
          public static final String LOCKSCREEN_NOTIFICATIONS_FORCE_EXPANDED_VIEW = "lockscreen_notifications_force_expanded_view";
          
          /**
+          * 0 = no
+          * 1 = yes
+          * @hide
+          */
+         public static final String IMMERSIVE_MODE = "immersive_mode";
+         
+         /**
           * Wakes the device when a new notifications is received
           * @hide
           */
@@ -2702,6 +2709,12 @@ public final class Settings {
          * @hide
          */
         public static final String NAV_BUTTONS = "nav_buttons";
+
+        /**
+         * Quick settings tiles to show on status bar
+         * @hide
+         */
+        public static final String QUICK_SETTINGS_TILES = "quick_settings_tiles";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
