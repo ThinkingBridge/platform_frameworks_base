@@ -251,15 +251,16 @@ public class PhoneStatusBarView extends PanelBar {
         updateShortcutsVisibility();
     }
 
-
     public void updateShortcutsVisibility() {
         // Notification Shortcuts check for fully expanded panel
         if (mBar.mSettingsButton == null || mBar.mNotificationButton == null) {
             // Tablet
             if (mFullyOpenedPanel != null) {
                 mBar.updateNotificationShortcutsVisibility(true);
+                mBar.updateCarrierAndWifiLabelVisibility(false, false);
             } else {
                 mBar.updateNotificationShortcutsVisibility(false);
+                mBar.updateCarrierAndWifiLabelVisibility(false, true);
             }
         } else {
             // Phone
@@ -268,11 +269,12 @@ public class PhoneStatusBarView extends PanelBar {
                     !(mBar.mSettingsButton.getVisibility() == View.VISIBLE &&
                     mBar.mNotificationButton.getVisibility() == View.VISIBLE))) {
                 mBar.updateNotificationShortcutsVisibility(true);
+                mBar.updateCarrierAndWifiLabelVisibility(false, false);
             } else {
                 mBar.updateNotificationShortcutsVisibility(false);
+                mBar.updateCarrierAndWifiLabelVisibility(false, true);
             }
         }
-        mBar.updateCarrierAndWifiLabelVisibility(false);
     }
 
 }
