@@ -2565,6 +2565,12 @@ public final class Settings {
          * @hide
          */
         public static final String EGG_MODE = "egg_mode";
+        
+        /**
+         * Allows to show the background activity back the lockscreen
+         * @hide
+         */
+         public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
 
         /**
          * Show or hide clock
