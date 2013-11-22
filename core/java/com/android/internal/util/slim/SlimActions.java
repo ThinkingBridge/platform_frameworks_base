@@ -93,7 +93,8 @@ public class SlimActions {
             } else if (action.equals(ButtonsConstants.ACTION_SEARCH)) {
                 injectKeyDelayed(KeyEvent.KEYCODE_SEARCH, isLongpress, false);
                 return;
-            } else if (action.equals(ButtonsConstants.ACTION_MENU)) {
+            } else if (action.equals(ButtonsConstants.ACTION_MENU)
+                    || action.equals(ButtonsConstants.ACTION_MENU_BIG)) {
                 injectKeyDelayed(KeyEvent.KEYCODE_MENU, isLongpress, false);
                 return;
             } else if (action.equals(ButtonsConstants.ACTION_POWER_MENU)) {
@@ -272,6 +273,7 @@ public class SlimActions {
                 || action.equals(ButtonsConstants.ACTION_BACK)
                 || action.equals(ButtonsConstants.ACTION_SEARCH)
                 || action.equals(ButtonsConstants.ACTION_MENU)
+                || action.equals(ButtonsConstants.ACTION_MENU_BIG)
                 || action.equals(ButtonsConstants.ACTION_POWER_MENU)
                 || action.equals(ButtonsConstants.ACTION_NULL)) {
             return true;
