@@ -3480,7 +3480,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return vis;
     }
 
-    private boolean expandedDesktopHidesNavigationBar() {
+    /** {@inheritDoc} */
+    public int getCurrentNavigationBarSize() {
+        boolean landscape = mContext.getResources().getConfiguration()
+            .orientation == Configuration.ORIENTATION_LANDSCAPE;
+        if (landscape && !mNavigationBarCanMove) {
+            return mNavigationBarHeightLandscape;
+        } else if (landscape && mNavigationBarCanMove) {
+            return mNavigationBarWidth;
+        }
+        return mNavigationBarHeight;
+    }
+
+    /** {@inheritDoc} */
+    public boolean expandedDesktopHidesNavigationBar() {
         boolean landscape = mContext.getResources().getConfiguration()
             .orientation == Configuration.ORIENTATION_LANDSCAPE;
         if (mExpandedDesktopMode == 1) {
@@ -3491,7 +3504,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return false;
     }
 
-    private boolean expandedDesktopHidesStatusBar() {
+    /** {@inheritDoc} */
+    public boolean expandedDesktopHidesStatusBar() {
         return mExpandedDesktopMode != 0;
     }
 
