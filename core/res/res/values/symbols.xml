@@ -1813,5 +1813,10 @@
   <java-symbol type="string" name="minutes" />
   <java-symbol type="string" name="second" />
   <java-symbol type="string" name="seconds" />
+  
+  <!-- Description of accessibility direction for targets -->
+  <java-symbol type="string" name="accessibility_target_direction" />
+  <!-- Description of accessibility unlock target -->
+  <java-symbol type="string" name="description_target_unlock" />
 
 </resources>
