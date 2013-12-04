@@ -2794,6 +2794,13 @@ public final class Settings {
          * @hide
          */
         public static final String QUICK_TILES_BG_ALPHA = "quick_tiles_bg_alpha";
+        
+        /**
+         * Quick Settings Quick Pulldown
+         *
+         * @hide
+         */
+        public static final String QS_QUICK_PULLDOWN = "qs_quick_pulldown";
 
         /**
          * Electronic beam animation mode
