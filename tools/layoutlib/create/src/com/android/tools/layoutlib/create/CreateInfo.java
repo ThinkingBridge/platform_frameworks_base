@@ -131,7 +131,6 @@ public final class CreateInfo implements ICreateInfo {
         "android.os.HandlerThread#run",
         "android.os.Build#getString",
         "android.text.format.DateFormat#is24HourFormat",
-        "android.text.format.Time#format1",
         "android.view.Choreographer#getRefreshRate",
         "android.view.Display#updateDisplayInfoLocked",
         "android.view.LayoutInflater#rInflate",
