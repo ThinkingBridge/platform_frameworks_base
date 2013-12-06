@@ -1,14 +1,14 @@
-/*
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>packages/Keyguard/src/com/android/keyguard/KeyguardTransportControlView.java - platform/frameworks/base - Git at Google</title><link rel="stylesheet" type="text/css" href="//www.google.com/css/go.css" /><link rel="stylesheet" type="text/css" href="/+static/prettify/prettify.vf-M93Ay4IiiWRQSJKPGWQ.cache.css" /><link rel="stylesheet" type="text/css" href="/+static/gitiles.JPyDgEz4Jj5aQRFU8GjJJQ.cache.css" /><script src="/+static/prettify/prettify_compiled.GHRTDQJlSdpNotJivTmj9w.cache.js" type="text/javascript"></script></head><body onload="prettyPrint()"><h1><img src="//www.google.com/images/logo_sm.gif" alt="Google" />Git</h1><div class="menu"> <a href="https://www.google.com/a/SelectSession?service=gerritcodereview&amp;continue=https://android.googlesource.com/login/platform/frameworks/base/%2B/android-4.4.1_r1/packages/Keyguard/src/com/android/keyguard/KeyguardTransportControlView.java">Sign in</a> </div><div class="breadcrumbs"><a href="/?format=HTML">android</a> / <a href="/platform/frameworks/base/">platform/frameworks/base</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1">android-4.4.1_r1</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/">.</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages">packages</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages/Keyguard">Keyguard</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages/Keyguard/src?autodive=0">src</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages/Keyguard/src/com?autodive=0">com</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages/Keyguard/src/com/android?autodive=0">android</a> / <a href="/platform/frameworks/base/+/android-4.4.1_r1/packages/Keyguard/src/com/android/keyguard">keyguard</a> / KeyguardTransportControlView.java</div><div class="sha1">blob: 349078f2c6f82e4a062648c2e4146294d82f08a6 [<a href="/platform/frameworks/base/+log/android-4.4.1_r1/packages/Keyguard/src/com/android/keyguard/KeyguardTransportControlView.java">file history</a>]</div><pre class="git-blob prettyprint linenums lang-java">/*
  * Copyright (C) 2011 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -60,12 +60,12 @@ import java.util.TimeZone;
  */
 public class KeyguardTransportControlView extends FrameLayout {
 
-    private static final int DISPLAY_TIMEOUT_MS = 5000; // 5s
     private static final int RESET_TO_METADATA_DELAY = 5000;
     protected static final boolean DEBUG = false;
-    protected static final String TAG = "TransportControlView";
+    protected static final String TAG = &quot;TransportControlView&quot;;
 
-    private static final boolean ANIMATE_TRANSITIONS = false;
+    private static final boolean ANIMATE_TRANSITIONS = true;
+    protected static final long QUIESCENT_PLAYBACK_FACTOR = 1000;
 
     private ViewGroup mMetadataContainer;
     private ViewGroup mInfoContainer;
@@ -75,7 +75,7 @@ public class KeyguardTransportControlView extends FrameLayout {
     private View mTransientSeek;
     private SeekBar mTransientSeekBar;
     private TextView mTransientSeekTimeElapsed;
-    private TextView mTransientSeekTimeRemaining;
+    private TextView mTransientSeekTimeTotal;
 
     private ImageView mBtnPrev;
     private ImageView mBtnPlay;
@@ -89,11 +89,12 @@ public class KeyguardTransportControlView extends FrameLayout {
     private ImageView mBadge;
 
     private boolean mSeekEnabled;
-    private boolean mUserSeeking;
     private java.text.DateFormat mFormat;
 
+    private Date mTempDate = new Date();
+
     /**
-     * The metadata which should be populated into the view once we've been attached
+     * The metadata which should be populated into the view once we&#39;ve been attached
      */
     private RemoteController.MetadataEditor mPopulateMetadataWhenAttached = null;
 
@@ -108,18 +109,25 @@ public class KeyguardTransportControlView extends FrameLayout {
 
         @Override
         public void onClientPlaybackStateUpdate(int state) {
-            setSeekBarsEnabled(false);
             updatePlayPauseState(state);
         }
 
         @Override
         public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs,
                 long currentPosMs, float speed) {
-            setSeekBarsEnabled(mMetadata != null && mMetadata.duration > 0);
             updatePlayPauseState(state);
-            if (DEBUG) Log.d(TAG, "onClientPlaybackStateUpdate(state=" + state +
-                    ", stateChangeTimeMs=" + stateChangeTimeMs + ", currentPosMs=" + currentPosMs +
-                    ", speed=" + speed + ")");
+            if (DEBUG) Log.d(TAG, &quot;onClientPlaybackStateUpdate(state=&quot; + state +
+                    &quot;, stateChangeTimeMs=&quot; + stateChangeTimeMs + &quot;, currentPosMs=&quot; + currentPosMs +
+                    &quot;, speed=&quot; + speed + &quot;)&quot;);
+
+            removeCallbacks(mUpdateSeekBars);
+            // Since the music client may be responding to historical events that cause the
+            // playback state to change dramatically, wait until things become quiescent before
+            // resuming automatic scrub position update.
+            if (mTransientSeek.getVisibility() == View.VISIBLE
+                    &amp;&amp; playbackPositionShouldMove(mCurrentPlayState)) {
+                postDelayed(mUpdateSeekBars, QUIESCENT_PLAYBACK_FACTOR);
+            }
         }
 
         @Override
@@ -133,13 +141,20 @@ public class KeyguardTransportControlView extends FrameLayout {
         }
     };
 
-    private final Runnable mUpdateSeekBars = new Runnable() {
+    private class UpdateSeekBarRunnable implements  Runnable {
         public void run() {
-            if (updateSeekBars()) {
+            boolean seekAble = updateOnce();
+            if (seekAble) {
+                removeCallbacks(this);
                 postDelayed(this, 1000);
             }
         }
+        public boolean updateOnce() {
+            return updateSeekBars();
+        }
     };
+
+    private final UpdateSeekBarRunnable mUpdateSeekBars = new UpdateSeekBarRunnable();
 
     private final Runnable mResetToMetadata = new Runnable() {
         public void run() {
@@ -159,6 +174,7 @@ public class KeyguardTransportControlView extends FrameLayout {
             }
             if (keyCode != -1) {
                 sendMediaButtonClick(keyCode);
+                delayResetToMetadata(); // if the scrub bar is showing, keep showing it.
             }
         }
     };
@@ -173,25 +189,67 @@ public class KeyguardTransportControlView extends FrameLayout {
         }
     };
 
+    // This class is here to throttle scrub position updates to the music client
+    class FutureSeekRunnable implements Runnable {
+        private int mProgress;
+        private boolean mPending;
+
+        public void run() {
+            scrubTo(mProgress);
+            mPending = false;
+        }
+
+        void setProgress(int progress) {
+            mProgress = progress;
+            if (!mPending) {
+                mPending = true;
+                postDelayed(this, 30);
+            }
+        }
+    };
+
+    // This is here because RemoteControlClient&#39;s method isn&#39;t visible :/
+    private final static boolean playbackPositionShouldMove(int playstate) {
+        switch(playstate) {
+            case RemoteControlClient.PLAYSTATE_STOPPED:
+            case RemoteControlClient.PLAYSTATE_PAUSED:
+            case RemoteControlClient.PLAYSTATE_BUFFERING:
+            case RemoteControlClient.PLAYSTATE_ERROR:
+            case RemoteControlClient.PLAYSTATE_SKIPPING_FORWARDS:
+            case RemoteControlClient.PLAYSTATE_SKIPPING_BACKWARDS:
+                return false;
+            case RemoteControlClient.PLAYSTATE_PLAYING:
+            case RemoteControlClient.PLAYSTATE_FAST_FORWARDING:
+            case RemoteControlClient.PLAYSTATE_REWINDING:
+            default:
+                return true;
+        }
+    }
+
+    private final FutureSeekRunnable mFutureSeekRunnable = new FutureSeekRunnable();
+
     private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener =
             new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser) {
-                scrubTo(progress);
+                mFutureSeekRunnable.setProgress(progress);
                 delayResetToMetadata();
+                mTempDate.setTime(progress);
+                mTransientSeekTimeElapsed.setText(mFormat.format(mTempDate));
+            } else {
+                updateSeekDisplay();
             }
-            updateSeekDisplay();
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            mUserSeeking = true;
+            delayResetToMetadata();
+            removeCallbacks(mUpdateSeekBars); // don&#39;t update during user interaction
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            mUserSeeking = false;
         }
     };
 
@@ -204,15 +262,15 @@ public class KeyguardTransportControlView extends FrameLayout {
             = new KeyguardUpdateMonitorCallback() {
         public void onScreenTurnedOff(int why) {
             setEnableMarquee(false);
-        };
+        }
         public void onScreenTurnedOn() {
             setEnableMarquee(true);
-        };
+        }
     };
 
     public KeyguardTransportControlView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (DEBUG) Log.v(TAG, "Create TCV " + this);
+        if (DEBUG) Log.v(TAG, &quot;Create TCV &quot; + this);
         mAudioManager = new AudioManager(mContext);
         mCurrentPlayState = RemoteControlClient.PLAYSTATE_NONE; // until we get a callback
         mRemoteController = new RemoteController(context, mRCClientUpdateListener);
@@ -236,24 +294,17 @@ public class KeyguardTransportControlView extends FrameLayout {
     private void updateTransportControls(int transportControlFlags) {
         mTransportControlFlags = transportControlFlags;
         setSeekBarsEnabled(
-                (transportControlFlags & RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE) != 0);
+                (transportControlFlags &amp; RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE) != 0);
     }
 
     void setSeekBarsEnabled(boolean enabled) {
         if (enabled == mSeekEnabled) return;
 
         mSeekEnabled = enabled;
-        if (mTransientSeek.getVisibility() == VISIBLE) {
+        if (mTransientSeek.getVisibility() == VISIBLE &amp;&amp; !enabled) {
             mTransientSeek.setVisibility(INVISIBLE);
             mMetadataContainer.setVisibility(VISIBLE);
-            mUserSeeking = false;
             cancelResetToMetadata();
-        }
-        if (enabled) {
-            mUpdateSeekBars.run();
-            postDelayed(mUpdateSeekBars, 1000);
-        } else {
-            removeCallbacks(mUpdateSeekBars);
         }
     }
 
@@ -263,7 +314,7 @@ public class KeyguardTransportControlView extends FrameLayout {
     }
 
     private void setEnableMarquee(boolean enabled) {
-        if (DEBUG) Log.v(TAG, (enabled ? "Enable" : "Disable") + " transport text marquee");
+        if (DEBUG) Log.v(TAG, (enabled ? &quot;Enable&quot; : &quot;Disable&quot;) + &quot; transport text marquee&quot;);
         if (mTrackTitle != null) mTrackTitle.setSelected(enabled);
         if (mTrackArtistAlbum != null) mTrackTitle.setSelected(enabled);
     }
@@ -280,7 +331,7 @@ public class KeyguardTransportControlView extends FrameLayout {
         mTransientSeekBar = (SeekBar) findViewById(R.id.transient_seek_bar);
         mTransientSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         mTransientSeekTimeElapsed = (TextView) findViewById(R.id.transient_seek_time_elapsed);
-        mTransientSeekTimeRemaining = (TextView) findViewById(R.id.transient_seek_time_remaining);
+        mTransientSeekTimeTotal = (TextView) findViewById(R.id.transient_seek_time_remaining);
         mBtnPrev = (ImageView) findViewById(R.id.btn_prev);
         mBtnPlay = (ImageView) findViewById(R.id.btn_play);
         mBtnNext = (ImageView) findViewById(R.id.btn_next);
@@ -291,17 +342,20 @@ public class KeyguardTransportControlView extends FrameLayout {
         }
         final boolean screenOn = KeyguardUpdateMonitor.getInstance(mContext).isScreenOn();
         setEnableMarquee(screenOn);
+        // Allow long-press anywhere else in this view to show the seek bar
+        setOnLongClickListener(mTransportShowSeekBarListener);
     }
 
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (DEBUG) Log.v(TAG, "onAttachToWindow()");
+        if (DEBUG) Log.v(TAG, &quot;onAttachToWindow()&quot;);
         if (mPopulateMetadataWhenAttached != null) {
             updateMetadata(mPopulateMetadataWhenAttached);
             mPopulateMetadataWhenAttached = null;
         }
-        if (DEBUG) Log.v(TAG, "Registering TCV " + this);
+        if (DEBUG) Log.v(TAG, &quot;Registering TCV &quot; + this);
+        mMetadata.clear();
         mAudioManager.registerRemoteController(mRemoteController);
         KeyguardUpdateMonitor.getInstance(mContext).registerCallback(mUpdateMonitor);
     }
@@ -316,13 +370,40 @@ public class KeyguardTransportControlView extends FrameLayout {
 
     @Override
     public void onDetachedFromWindow() {
-        if (DEBUG) Log.v(TAG, "onDetachFromWindow()");
+        if (DEBUG) Log.v(TAG, &quot;onDetachFromWindow()&quot;);
         super.onDetachedFromWindow();
-        if (DEBUG) Log.v(TAG, "Unregistering TCV " + this);
+        if (DEBUG) Log.v(TAG, &quot;Unregistering TCV &quot; + this);
         mAudioManager.unregisterRemoteController(mRemoteController);
         KeyguardUpdateMonitor.getInstance(mContext).removeCallback(mUpdateMonitor);
-        mUserSeeking = false;
+        mMetadata.clear();
         removeCallbacks(mUpdateSeekBars);
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        SavedState ss = new SavedState(super.onSaveInstanceState());
+        ss.artist = mMetadata.artist;
+        ss.trackTitle = mMetadata.trackTitle;
+        ss.albumTitle = mMetadata.albumTitle;
+        ss.duration = mMetadata.duration;
+        ss.bitmap = mMetadata.bitmap;
+        return ss;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+        SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+        mMetadata.artist = ss.artist;
+        mMetadata.trackTitle = ss.trackTitle;
+        mMetadata.albumTitle = ss.albumTitle;
+        mMetadata.duration = ss.duration;
+        mMetadata.bitmap = ss.bitmap;
+        populateMetadata();
     }
 
     void setBadgeIcon(Drawable bmp) {
@@ -351,8 +432,8 @@ public class KeyguardTransportControlView extends FrameLayout {
         }
 
         public String toString() {
-            return "Metadata[artist=" + artist + " trackTitle=" + trackTitle +
-                    " albumTitle=" + albumTitle + " duration=" + duration + "]";
+            return &quot;Metadata[artist=&quot; + artist + &quot; trackTitle=&quot; + trackTitle +
+                    &quot; albumTitle=&quot; + albumTitle + &quot; duration=&quot; + duration + &quot;]&quot;;
         }
     }
 
@@ -383,7 +464,7 @@ public class KeyguardTransportControlView extends FrameLayout {
      * Populates the given metadata into the view
      */
     private void populateMetadata() {
-        if (ANIMATE_TRANSITIONS && isLaidOut() && mMetadataContainer.getVisibility() == VISIBLE) {
+        if (ANIMATE_TRANSITIONS &amp;&amp; isLaidOut() &amp;&amp; mMetadataContainer.getVisibility() == VISIBLE) {
             TransitionManager.beginDelayedTransition(mMetadataContainer, mMetadataChangeTransition);
         }
 
@@ -392,50 +473,52 @@ public class KeyguardTransportControlView extends FrameLayout {
         try {
             badgeIcon = getContext().getPackageManager().getApplicationIcon(remoteClientPackage);
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Couldn't get remote control client package icon", e);
+            Log.e(TAG, &quot;Couldn&#39;t get remote control client package icon&quot;, e);
         }
         setBadgeIcon(badgeIcon);
-        if (!TextUtils.isEmpty(mMetadata.trackTitle)) {
-            mTrackTitle.setText(mMetadata.trackTitle);
-        }
-        StringBuilder sb = new StringBuilder();
+        mTrackTitle.setText(!TextUtils.isEmpty(mMetadata.trackTitle)
+                ? mMetadata.trackTitle : null);
+
+        final StringBuilder sb = new StringBuilder();
         if (!TextUtils.isEmpty(mMetadata.artist)) {
             if (sb.length() != 0) {
-                sb.append(" - ");
+                sb.append(&quot; - &quot;);
             }
             sb.append(mMetadata.artist);
         }
         if (!TextUtils.isEmpty(mMetadata.albumTitle)) {
             if (sb.length() != 0) {
-                sb.append(" - ");
+                sb.append(&quot; - &quot;);
             }
             sb.append(mMetadata.albumTitle);
         }
-        mTrackArtistAlbum.setText(sb.toString());
 
-        if (mMetadata.duration >= 0) {
+        final String trackArtistAlbum = sb.toString();
+        mTrackArtistAlbum.setText(!TextUtils.isEmpty(trackArtistAlbum) ?
+                trackArtistAlbum : null);
+
+        if (mMetadata.duration &gt;= 0) {
             setSeekBarsEnabled(true);
             setSeekBarDuration(mMetadata.duration);
 
             final String skeleton;
 
-            if (mMetadata.duration >= 86400000) {
-                skeleton = "DDD kk mm ss";
-            } else if (mMetadata.duration >= 3600000) {
-                skeleton = "kk mm ss";
+            if (mMetadata.duration &gt;= 86400000) {
+                skeleton = &quot;DDD kk mm ss&quot;;
+            } else if (mMetadata.duration &gt;= 3600000) {
+                skeleton = &quot;kk mm ss&quot;;
             } else {
-                skeleton = "mm ss";
+                skeleton = &quot;mm ss&quot;;
             }
             mFormat = new SimpleDateFormat(DateFormat.getBestDateTimePattern(
                     getContext().getResources().getConfiguration().locale,
                     skeleton));
-            mFormat.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+            mFormat.setTimeZone(TimeZone.getTimeZone(&quot;GMT+0&quot;));
         } else {
             setSeekBarsEnabled(false);
         }
 
-        KeyguardUpdateMonitor.getInstance(getContext()).dispatchSetBackground(
-                mMetadata.bitmap);
+        KeyguardUpdateMonitor.getInstance(getContext()).dispatchSetBackground(mMetadata.bitmap);
         final int flags = mTransportControlFlags;
         setVisibilityBasedOnFlag(mBtnPrev, flags, RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS);
         setVisibilityBasedOnFlag(mBtnNext, flags, RemoteControlClient.FLAG_KEY_MEDIA_NEXT);
@@ -449,16 +532,14 @@ public class KeyguardTransportControlView extends FrameLayout {
     }
 
     void updateSeekDisplay() {
-        if (mMetadata != null && mRemoteController != null && mFormat != null) {
-            final long timeElapsed = mRemoteController.getEstimatedMediaPosition();
-            final long duration = mMetadata.duration;
-            final long remaining = duration - timeElapsed;
+        if (mMetadata != null &amp;&amp; mRemoteController != null &amp;&amp; mFormat != null) {
+            mTempDate.setTime(mRemoteController.getEstimatedMediaPosition());
+            mTransientSeekTimeElapsed.setText(mFormat.format(mTempDate));
+            mTempDate.setTime(mMetadata.duration);
+            mTransientSeekTimeTotal.setText(mFormat.format(mTempDate));
 
-            mTransientSeekTimeElapsed.setText(mFormat.format(new Date(timeElapsed)));
-            mTransientSeekTimeRemaining.setText(mFormat.format(new Date(remaining)));
-
-            if (DEBUG) Log.d(TAG, "updateSeekDisplay timeElapsed=" + timeElapsed +
-                    " duration=" + duration + " remaining=" + remaining);
+            if (DEBUG) Log.d(TAG, &quot;updateSeekDisplay timeElapsed=&quot; + mTempDate +
+                    &quot; duration=&quot; + mMetadata.duration);
         }
     }
 
@@ -470,10 +551,16 @@ public class KeyguardTransportControlView extends FrameLayout {
             mTransientSeek.setVisibility(INVISIBLE);
             mMetadataContainer.setVisibility(VISIBLE);
             cancelResetToMetadata();
+            removeCallbacks(mUpdateSeekBars); // don&#39;t update if scrubber isn&#39;t visible
         } else {
             mTransientSeek.setVisibility(VISIBLE);
             mMetadataContainer.setVisibility(INVISIBLE);
             delayResetToMetadata();
+            if (playbackPositionShouldMove(mCurrentPlayState)) {
+                mUpdateSeekBars.run();
+            } else {
+                mUpdateSeekBars.updateOnce();
+            }
         }
         mTransportControlCallback.userActivity();
         return true;
@@ -509,7 +596,7 @@ public class KeyguardTransportControlView extends FrameLayout {
     }
 
     private static void setVisibilityBasedOnFlag(View view, int flags, int flag) {
-        if ((flags & flag) != 0) {
+        if ((flags &amp; flag) != 0) {
             view.setVisibility(View.VISIBLE);
         } else {
             view.setVisibility(View.INVISIBLE);
@@ -518,7 +605,7 @@ public class KeyguardTransportControlView extends FrameLayout {
 
     private void updatePlayPauseState(int state) {
         if (DEBUG) Log.v(TAG,
-                "updatePlayPauseState(), old=" + mCurrentPlayState + ", state=" + state);
+                &quot;updatePlayPauseState(), old=&quot; + mCurrentPlayState + &quot;, state=&quot; + state);
         if (state == mCurrentPlayState) {
             return;
         }
@@ -527,7 +614,7 @@ public class KeyguardTransportControlView extends FrameLayout {
         switch (state) {
             case RemoteControlClient.PLAYSTATE_ERROR:
                 imageResId = R.drawable.stat_sys_warning;
-                // TODO use more specific image description string for warning, but here the "play"
+                // TODO use more specific image description string for warning, but here the &quot;play&quot;
                 //      message is still valid because this button triggers a play command.
                 imageDescId = R.string.keyguard_transport_play_description;
                 break;
@@ -535,9 +622,6 @@ public class KeyguardTransportControlView extends FrameLayout {
             case RemoteControlClient.PLAYSTATE_PLAYING:
                 imageResId = R.drawable.ic_media_pause;
                 imageDescId = R.string.keyguard_transport_pause_description;
-                if (mSeekEnabled) {
-                    postDelayed(mUpdateSeekBars, 1000);
-                }
                 break;
 
             case RemoteControlClient.PLAYSTATE_BUFFERING:
@@ -552,10 +636,9 @@ public class KeyguardTransportControlView extends FrameLayout {
                 break;
         }
 
-        if (state != RemoteControlClient.PLAYSTATE_PLAYING) {
-            removeCallbacks(mUpdateSeekBars);
-            updateSeekBars();
-        }
+        boolean clientSupportsSeek = mMetadata != null &amp;&amp; mMetadata.duration &gt; 0;
+        setSeekBarsEnabled(clientSupportsSeek);
+
         mBtnPlay.setImageResource(imageResId);
         mBtnPlay.setContentDescription(getResources().getString(imageDescId));
         mCurrentPlayState = state;
@@ -563,20 +646,24 @@ public class KeyguardTransportControlView extends FrameLayout {
 
     boolean updateSeekBars() {
         final int position = (int) mRemoteController.getEstimatedMediaPosition();
-        if (position >= 0) {
-            if (!mUserSeeking) {
-                mTransientSeekBar.setProgress(position);
-            }
+        if (DEBUG) Log.v(TAG, &quot;Estimated time:&quot; + position);
+        if (position &gt;= 0) {
+            mTransientSeekBar.setProgress(position);
             return true;
         }
-        Log.w(TAG, "Updating seek bars; received invalid estimated media position (" +
-                position + "). Disabling seek.");
+        Log.w(TAG, &quot;Updating seek bars; received invalid estimated media position (&quot; +
+                position + &quot;). Disabling seek.&quot;);
         setSeekBarsEnabled(false);
         return false;
     }
 
     static class SavedState extends BaseSavedState {
         boolean clientPresent;
+        String artist;
+        String trackTitle;
+        String albumTitle;
+        long duration;
+        Bitmap bitmap;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -584,17 +671,27 @@ public class KeyguardTransportControlView extends FrameLayout {
 
         private SavedState(Parcel in) {
             super(in);
-            this.clientPresent = in.readInt() != 0;
+            clientPresent = in.readInt() != 0;
+            artist = in.readString();
+            trackTitle = in.readString();
+            albumTitle = in.readString();
+            duration = in.readLong();
+            bitmap = Bitmap.CREATOR.createFromParcel(in);
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeInt(this.clientPresent ? 1 : 0);
+            out.writeInt(clientPresent ? 1 : 0);
+            out.writeString(artist);
+            out.writeString(trackTitle);
+            out.writeString(albumTitle);
+            out.writeLong(duration);
+            bitmap.writeToParcel(out, flags);
         }
 
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
+        public static final Parcelable.Creator&lt;SavedState&gt; CREATOR
+                = new Parcelable.Creator&lt;SavedState&gt;() {
             public SavedState createFromParcel(Parcel in) {
                 return new SavedState(in);
             }
@@ -617,34 +714,5 @@ public class KeyguardTransportControlView extends FrameLayout {
     public boolean providesClock() {
         return false;
     }
-
-    private boolean wasPlayingRecently(int state, long stateChangeTimeMs) {
-        switch (state) {
-            case RemoteControlClient.PLAYSTATE_PLAYING:
-            case RemoteControlClient.PLAYSTATE_FAST_FORWARDING:
-            case RemoteControlClient.PLAYSTATE_REWINDING:
-            case RemoteControlClient.PLAYSTATE_SKIPPING_FORWARDS:
-            case RemoteControlClient.PLAYSTATE_SKIPPING_BACKWARDS:
-            case RemoteControlClient.PLAYSTATE_BUFFERING:
-                // actively playing or about to play
-                return true;
-            case RemoteControlClient.PLAYSTATE_NONE:
-                return false;
-            case RemoteControlClient.PLAYSTATE_STOPPED:
-            case RemoteControlClient.PLAYSTATE_PAUSED:
-            case RemoteControlClient.PLAYSTATE_ERROR:
-                // we have stopped playing, check how long ago
-                if (DEBUG) {
-                    if ((SystemClock.elapsedRealtime() - stateChangeTimeMs) < DISPLAY_TIMEOUT_MS) {
-                        Log.v(TAG, "wasPlayingRecently: time < TIMEOUT was playing recently");
-                    } else {
-                        Log.v(TAG, "wasPlayingRecently: time > TIMEOUT");
-                    }
-                }
-                return ((SystemClock.elapsedRealtime() - stateChangeTimeMs) < DISPLAY_TIMEOUT_MS);
-            default:
-                Log.e(TAG, "Unknown playback state " + state + " in wasPlayingRecently()");
-                return false;
-        }
-    }
 }
+</pre><div class="footer">Powered by <a href="https://code.google.com/p/gitiles/">Gitiles</a></div></body></html>

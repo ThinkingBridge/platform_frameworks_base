@@ -113,6 +113,10 @@ public class Main {
                         "android.pim.*", // for datepicker
                         "android.os.*",  // for android.os.Handler
                         "android.database.ContentObserver", // for Digital clock
+<<<<<<< HEAD
+=======
+                        "com.android.i18n.phonenumbers.*",  // for TextView with autolink attribute
+>>>>>>> android-4.4.1_r1
                     },
                     excludeClasses);
             aa.analyze();

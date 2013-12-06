@@ -273,7 +273,10 @@ public abstract class RenderAction<T extends RenderParams> extends FrameworkReso
             mContext.getRenderResources().setLogger(null);
         }
 
+<<<<<<< HEAD
         mContext = null;
+=======
+>>>>>>> android-4.4.1_r1
     }
 
     public static BridgeContext getCurrentContext() {
