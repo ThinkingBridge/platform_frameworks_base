@@ -278,7 +278,6 @@
   <java-symbol type="bool" name="config_enableWallpaperService" />
   <java-symbol type="bool" name="config_sendAudioBecomingNoisy" />
   <java-symbol type="bool" name="config_enableScreenshotChord" />
-  <java-symbol type="bool" name="config_enableScreenrecordChord" />
   <java-symbol type="bool" name="config_bluetooth_default_profiles" />
   <java-symbol type="bool" name="config_enableWifiDisplay" />
   <java-symbol type="bool" name="config_useDevInputEventForAudioJack" />
@@ -1071,8 +1070,6 @@
   <java-symbol type="drawable" name="jog_tab_target_gray" />
   <java-symbol type="drawable" name="picture_emergency" />
   <java-symbol type="drawable" name="platlogo" />
-  <java-symbol type="drawable" name="aokplogo" />
-  <java-symbol type="drawable" name="aokplogo_alt" />
   <java-symbol type="drawable" name="stat_notify_sync_error" />
   <java-symbol type="drawable" name="stat_notify_wifi_in_range" />
   <java-symbol type="drawable" name="stat_notify_rssi_in_range" />
@@ -1764,14 +1761,10 @@
   <java-symbol type="dimen" name="subtitle_shadow_offset" />
   <java-symbol type="dimen" name="subtitle_outline_width" />
 
-  <!-- ################################# AOKP Symbols ############################### 
--->
+  <!-- ThinkingBridge -->
 
   <java-symbol type="bool" name="config_smsSamsungCdmaAlternateMessageIDEncoding" />
   <java-symbol type="bool" name="config_samsung_stk" />
-
-  <!-- Hardware Key ReMapping -->
-  <java-symbol type="integer" name="config_deviceHardwareKeys" />
   <java-symbol type="bool" name="config_wifiApStartInterface" />
 
 </resources>
