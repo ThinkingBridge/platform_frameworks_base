@@ -890,9 +890,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     private void prepareNavigationBarView() {
         mNavigationBarView.reorient();
 
-        mNavigationBarView.setListeners(mRecentsClickListener, mRecentsLongClickListener,
+        mNavigationBarView.setListeners(mRecentsClickListener,
                 mRecentsPreloadOnTouchListener, mHomeSearchActionListener);
-
         updateSearchPanel();
     }
 
