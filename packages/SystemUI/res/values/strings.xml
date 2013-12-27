@@ -507,8 +507,22 @@
          linebreak to position it correctly.  [CHAR LIMIT=45] -->
     <string name="ssl_ca_cert_warning">Network may\nbe monitored</string>
     
+    <!-- Content description of the data connection type HSPA+ for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_data_connection_HP">HSPA+</string>
+    
     <!-- QS Battery Tile -->
     <string name="quick_settings_battery_charging">Charging</string>
     <string name="quick_settings_battery_discharging">Discharging</string>
+    
+    <!-- Dialog title for navigation bar button selection -->
+    <string name="navbar_dialog_title">Choose action to assign</string>
+    <string name="navbar_home_button">Home button</string>
+    <string name="navbar_recent_button">Recent button</string>
+    <string name="navbar_search_button">Search button</string>
+    <string name="navbar_back_button">Back button</string>
+    <string name="navbar_empty_button">Empty button</string>
+    <string name="navbar_menu_conditional_button">Menu (autoHide) button</string>
+    <string name="navbar_menu_always_button">Menu (alwaysShow) button</string>
+    <string name="navbar_menu_big_button">Menu button</string>
 
 </resources>
