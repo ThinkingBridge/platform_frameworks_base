@@ -2627,6 +2627,12 @@ public final class Settings {
           * @hide
           */
          public static final String LOCKSCREEN_NOTIFICATIONS_FORCE_EXPANDED_VIEW = "lockscreen_notifications_force_expanded_view";
+         
+         /**
+          * Wakes the device when a new notifications is received
+          * @hide
+          */
+         public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
 
         /**
          * Show or hide clock
@@ -2660,7 +2666,7 @@ public final class Settings {
          */
         public static final String STATUSBAR_CLOCK_COLOR = "statusbar_clock_color";
 
-        /**
+       /**
         * @hide
         * Shows custom date before clock time
         * 0 - No Date
@@ -2669,7 +2675,7 @@ public final class Settings {
         */
         public static final String STATUSBAR_CLOCK_DATE_DISPLAY = "statusbar_clock_date_display";
 
-        /**
+       /**
         * @hide
         * Sets the date string style
         * 0 - Regular style
@@ -2678,7 +2684,7 @@ public final class Settings {
         */
         public static final String STATUSBAR_CLOCK_DATE_STYLE = "statusbar_clock_date_style";
 
-        /**
+       /**
         * @hide
         * Stores the java DateFormat string for the date
         */
