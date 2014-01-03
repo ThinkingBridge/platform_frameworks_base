@@ -135,10 +135,11 @@ class QuickSettings {
     boolean mEditModeEnabled = false;
 
     private Handler mHandler;
+
     private QuickSettingsTileView mBatteryTile;
     private BatteryMeterView mBattery;
     private BatteryCircleMeterView mCircleBattery;
-    private int mBatteryStyle;
+    private boolean mBatteryHasPercent;
 
     public QuickSettings(Context context, QuickSettingsContainerView container) {
         mDevicePolicyManager
@@ -326,13 +327,17 @@ class QuickSettings {
     }
     
     public void updateBattery() {
-        if (mBattery == null || mModel == null) {
+        if (mBattery == null || mCircleBattery == null || mModel == null) {
             return;
         }
-        mBatteryStyle = Settings.System.getInt(mContext.getContentResolver(),
-                                Settings.System.STATUS_BAR_BATTERY_STYLE, 0);
         mCircleBattery.updateSettings();
         mBattery.updateSettings();
+        int batteryStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.STATUS_BAR_BATTERY, 0, UserHandle.USER_CURRENT);
+        mBatteryHasPercent = batteryStyle == BatteryMeterView.BATTERY_STYLE_ICON_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_CIRCLE_PERCENT
+            || batteryStyle == BatteryMeterView.BATTERY_STYLE_DOTTED_CIRCLE_PERCENT;
         mModel.refreshBatteryTile();
     }
 
@@ -618,22 +623,21 @@ class QuickSettings {
                                 t = mContext.getString(
                                         R.string.quick_settings_battery_charged_label);
                             } else {
-                                if (batteryState.pluggedIn) {
-                                    t = mBatteryStyle != 3 // circle percent
+                            	if (!mBatteryHasPercent) {
+                                    t = batteryState.pluggedIn
                                         ? mContext.getString(R.string.quick_settings_battery_charging_label,
-                                            batteryState.batteryLevel)
-                                        : mContext.getString(R.string.quick_settings_battery_charging);
-                                } else {     // battery bar or battery circle
-                                    t = (mBatteryStyle == 0 || mBatteryStyle == 2)
-                                        ? mContext.getString(R.string.status_bar_settings_battery_meter_format,
-                                            batteryState.batteryLevel)
+                                                batteryState.batteryLevel)
+                                        : mContext.getString(R.string.status_bar_settings_battery_meter_format,
+                                                batteryState.batteryLevel);
+                                } else {
+                                    t = batteryState.pluggedIn
+                                        ? mContext.getString(R.string.quick_settings_battery_charging)
                                         : mContext.getString(R.string.quick_settings_battery_discharging);
                                 }
                             }
                             ((TextView)mBatteryTile.findViewById(R.id.text)).setText(t);
                             mBatteryTile.setContentDescription(
-                                    mContext.getString(
-                                            R.string.accessibility_quick_settings_battery, t));
+                                    mContext.getString(R.string.accessibility_quick_settings_battery, t));
                         }
                     });
                     parent.addView(mBatteryTile);
