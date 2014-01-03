@@ -359,7 +359,7 @@ bool BootAnimation::android()
     glShadeModel(GL_FLAT);
     glDisable(GL_DITHER);
     glDisable(GL_SCISSOR_TEST);
-    glClearColor(1.0,1.0,1.0,0.0); // white background
+    glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
     eglSwapBuffers(mDisplay, mSurface);
 
