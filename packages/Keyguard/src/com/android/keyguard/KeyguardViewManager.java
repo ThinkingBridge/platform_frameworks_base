@@ -630,10 +630,6 @@ public class KeyguardViewManager {
         if (DEBUG) Log.d(TAG, "onScreenTurnedOn()");
         mScreenOn = true;
 
-        if (mLockscreenNotifications) {
-            mNotificationViewManager.onScreenTurnedOn();
-        }
-
         // If keyguard is not showing, we need to inform PhoneWindowManager with a null
         // token so it doesn't wait for us to draw...
         final IBinder token = isShowing() ? mKeyguardHost.getWindowToken() : null;
@@ -666,6 +662,10 @@ public class KeyguardViewManager {
                     } catch (RemoteException e) {
                         Slog.w(TAG, "Exception calling onShown():", e);
                     }
+                }
+
+                if (mLockscreenNotifications) {
+                    mNotificationViewManager.onScreenTurnedOn();
                 }
             }
         } else if (callback != null) {

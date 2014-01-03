@@ -245,6 +245,7 @@ public class NotificationViewManager {
     public void onScreenTurnedOn() {
         mIsScreenOn = true;
         mTimeCovered = 0;
+        mHostView.bringToFront();
     }
 
     public void onDismiss() {
