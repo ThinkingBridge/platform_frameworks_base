@@ -50,6 +50,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 
 import java.lang.ref.WeakReference;
 
@@ -688,6 +691,8 @@ public class Dialog implements DialogInterface, Window.Callback,
     }
     
     public void onWindowFocusChanged(boolean hasFocus) {
+        if(hasFocus)
+            disassemble((ViewGroup)getWindow().getDecorView(),0);
     }
 
     public void onAttachedToWindow() {
@@ -1246,4 +1251,28 @@ public class Dialog implements DialogInterface, Window.Callback,
             }
         }
     }
+
+	public int disassemble(ViewGroup viewgroup, int count) {
+		int animcount = 0;
+		for (int i = 0; i < viewgroup.getChildCount(); i++) {
+			View view = viewgroup.getChildAt(i);
+			if (view instanceof ViewGroup) {
+				animcount++;
+                startAnim(view,count++);
+				count += disassemble((ViewGroup) view, ++count);
+			} 
+		}
+		return animcount;
+
+	}
+
+	public void startAnim(View view, int count) {
+		Animation anim = new TranslateAnimation(0.0f, 0.0f, getWindow().getDecorView().getHeight(), 0.0f);
+		anim.setInterpolator(AnimationUtils.loadInterpolator(mContext,
+				android.R.anim.decelerate_interpolator));
+		anim.setDuration(300);
+		anim.setStartOffset(150 * count);
+		view.startAnimation(anim);
+	}
+
 }
