@@ -1267,11 +1267,11 @@ public class Dialog implements DialogInterface, Window.Callback,
 	}
 
 	public void startAnim(View view, int count) {
-		Animation anim = new TranslateAnimation(0.0f, 0.0f, getWindow().getDecorView().getHeight(), 0.0f);
+		Animation anim = new TranslateAnimation(0.0f, 0.0f, getWindow().getDecorView().getBottom(), 0.0f);
 		anim.setInterpolator(AnimationUtils.loadInterpolator(mContext,
 				android.R.anim.decelerate_interpolator));
 		anim.setDuration(150);
-		anim.setStartOffset(150 * count);
+		anim.setStartOffset(100 * count);
 		view.startAnimation(anim);
 	}
 
