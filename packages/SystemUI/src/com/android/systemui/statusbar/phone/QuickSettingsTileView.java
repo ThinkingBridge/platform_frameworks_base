@@ -69,7 +69,7 @@ class QuickSettingsTileView extends FrameLayout {
         mRowSpan = 1;
 
         QuickSettingsTouchListener touchListener
-                = new QuickSettingsTouchListener();
+                = new QuickSettingsTouchListener(context);
         QuickSettingsDragListener dragListener = new QuickSettingsDragListener();
         setOnTouchListener(touchListener);
         setOnDragListener(dragListener);

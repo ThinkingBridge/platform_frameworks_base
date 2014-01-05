@@ -17,7 +17,9 @@
 package com.android.systemui.statusbar.phone;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.graphics.Point;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.DragShadowBuilder;
@@ -29,6 +31,11 @@ class QuickSettingsTouchListener implements OnTouchListener {
 
     public Point mDragPoint;
     public Point mCurrentPoint;
+    public Vibrator mVibrator;
+
+    public QuickSettingsTouchListener(Context context) {
+        mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+    }
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
@@ -44,6 +51,7 @@ class QuickSettingsTouchListener implements OnTouchListener {
                     && distance >= DISTANCE_THRESHOLD) {
                 ClipData data = ClipData.newPlainText("", "");
                 DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                mVibrator.vibrate(50);
                 view.startDrag(data, shadowBuilder, view, 0);
                 return true;
             }
