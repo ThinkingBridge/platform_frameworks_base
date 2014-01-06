@@ -36,5 +36,5 @@
     <color name="batterymeter_charge_color">#FFFFFFFF</color>
     <color name="batterymeter_bolt_color">#FF000000</color><!-- 100% black -->
     <color name="status_bar_clock_color">#FFFFFFFF</color>
-    <color name="status_bar_traffic_color">#FFFFFFFF</color>
+    <color name="status_bar_traffic_color">#FFDFDEDE</color>
 </resources>
