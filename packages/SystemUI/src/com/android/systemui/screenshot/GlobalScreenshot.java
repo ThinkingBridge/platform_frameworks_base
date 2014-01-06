@@ -54,6 +54,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Interpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 import com.android.systemui.R;
@@ -584,7 +585,9 @@ class GlobalScreenshot {
                 mScreenshotView.setTranslationY(0f);
                 mScreenshotView.setScaleX(SCREENSHOT_SCALE + mBgPaddingScale);
                 mScreenshotView.setScaleY(SCREENSHOT_SCALE + mBgPaddingScale);
-                mScreenshotView.setRotation(5.0f);
+                RotateAnimation rotateAnim = new RotateAnimation(0,5,RotateAnimation.RELATIVE_TO_SELF, 0.5f, RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+		rotateAnim.setDuration(500);
+                mScreenshotView.startAnimation(rotateAnim);
                 mScreenshotView.setVisibility(View.VISIBLE);
                 mScreenshotFlash.setAlpha(0f);
                 mScreenshotFlash.setVisibility(View.VISIBLE);
