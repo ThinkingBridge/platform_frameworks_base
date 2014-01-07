@@ -2696,6 +2696,12 @@ public final class Settings {
         * Stores the java DateFormat string for the date
         */
         public static final String STATUSBAR_CLOCK_DATE_FORMAT = "statusbar_clock_date_format";
+        
+        /**
+         * @hide
+         * Statusbar Second clock
+         */
+        public static final String STATUSBAR_CLOCK_SECOND = "statusbar_clock_second";
 
         /**
          * @hide
