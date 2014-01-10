@@ -193,6 +193,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     int mIconHPadding = -1;
     Display mDisplay;
     Point mCurrentDisplaySize = new Point();
+    int mCurrOrientation;
     private float mHeadsUpVerticalOffset;
     private int[] mPilePosition = new int[2];
 
@@ -3355,17 +3356,38 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
      * meantime, just update the things that we know change.
      */
     void updateResources() {
-        final Context context = mContext;
+    	final Context context = mContext;
         final Resources res = context.getResources();
 
-        if (mClearButton instanceof TextView) {
-            ((TextView)mClearButton).setText(context.getText(R.string.status_bar_clear_all_button));
+        // detect theme ui mode change
+        int uiThemeMode = res.getConfiguration().uiThemeMode;
+        if (uiThemeMode != mCurrUiThemeMode) {
+            mCurrUiThemeMode = uiThemeMode;
+            recreateStatusBar(false);
+            return;
         }
 
-        // Update the QuickSettings container
-        if (mQS != null) mQS.updateResources();
-
+        if (mClearButton instanceof TextView) {
+            ((TextView)mClearButton).setText(
+                    context.getText(R.string.status_bar_clear_all_button));
+        }
         loadDimens();
+
+        // check for orientation change and update only the container layout
+        // for all other configuration changes update complete QS
+        int orientation = res.getConfiguration().orientation;
+        if (orientation != mCurrOrientation) {
+            mCurrOrientation = orientation;
+            // Update the settings container
+            if (mSettingsContainer != null) {
+                mSettingsContainer.updateResources();
+            }
+        } else {
+            if (mQS != null) {
+                mQS.updateResources();
+            }
+        }
+
     }
 
     protected void loadDimens() {
