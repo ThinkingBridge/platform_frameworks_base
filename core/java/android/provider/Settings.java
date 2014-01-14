@@ -2593,67 +2593,12 @@ public final class Settings {
          public static final String LOCKSCREEN_BLUR_BEHIND = "lockscreen_blur_behind";
          public static final String LOCKSCREEN_BLUR_RADIUS = "lockscreen_blur_radius";
          
-         /**
-          * Enables/disables lockscreen notifications
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS = "lockscreen_notifications";
-
-         /**
-          * Turn screen on when device is pulled out of pocket
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_POCKET_MODE = "lockscreen_notifications_pocket_mode";
-
-         /**
-          * Turn screen on when pulled out of pocket even if no notifications are pending
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_SHOW_ALWAYS = "lockscreen_notifications_show_always";
-
-         /**
-          * Hide low priority notifications such as google now weather notifications from lockscreen notifications
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_HIDE_LOW_PRIORITY = "lockscreen_notifications_hide_low_priority";
-
-         /**
-          * Hide non clearable notifications from lockscreen notifications
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_HIDE_NON_CLEARABLE = "lockscreen_notifications_hide_non_clearable";
-
-         /**
-          * Allows dismissing even non-clearable notifications from lockscreen notifications.
-          * Of course, this doesn't really dismiss them, they're just not shown on lockscreen anymore.
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_DISMISS_ALL = "lockscreen_notifications_dismiss_all";
-
-         /**
-          * Toggle between extended and normal view by longpressing the notification
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_EXPANDED_VIEW = "lockscreen_notifications_expanded_view";
-
-         /**
-          * Show lockscreen notifications extended when possible
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_FORCE_EXPANDED_VIEW = "lockscreen_notifications_force_expanded_view";
-         
-         /**
-          * 0 = no
-          * 1 = yes
-          * @hide
-          */
+        /**
+         * 0 = no
+         * 1 = yes
+         * @hide
+         */
          public static final String IMMERSIVE_MODE = "immersive_mode";
-         
-         /**
-          * Wakes the device when a new notifications is received
-          * @hide
-          */
-         public static final String LOCKSCREEN_NOTIFICATIONS_WAKE_ON_NOTIFICATION = "lockscreen_notifications_wake_on_notification";
 
         /**
          * Show or hide clock
@@ -2687,7 +2632,7 @@ public final class Settings {
          */
         public static final String STATUSBAR_CLOCK_COLOR = "statusbar_clock_color";
 
-       /**
+        /**
         * @hide
         * Shows custom date before clock time
         * 0 - No Date
@@ -2696,7 +2641,7 @@ public final class Settings {
         */
         public static final String STATUSBAR_CLOCK_DATE_DISPLAY = "statusbar_clock_date_display";
 
-       /**
+        /**
         * @hide
         * Sets the date string style
         * 0 - Regular style
@@ -2705,7 +2650,7 @@ public final class Settings {
         */
         public static final String STATUSBAR_CLOCK_DATE_STYLE = "statusbar_clock_date_style";
 
-       /**
+        /**
         * @hide
         * Stores the java DateFormat string for the date
         */

@@ -1,7 +1,5 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- * Copyright (C) 2014 The ThinkingBridge Project
- * Copyright (C) 2013 ChameleonOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,10 +104,6 @@ public class KeyguardViewManager {
     private boolean mSeeThrough = false;
     private boolean mIsCoverflow = false;
 
-    private NotificationHostView mNotificationView;
-    private NotificationViewManager mNotificationViewManager;
-    private boolean mLockscreenNotifications = true;
-
     private KeyguardUpdateMonitorCallback mBackgroundChanger = new KeyguardUpdateMonitorCallback() {
         @Override
         public void onSetBackground(Bitmap bmp) {
@@ -135,8 +129,6 @@ public class KeyguardViewManager {
                     Settings.System.LOCKSCREEN_SEE_THROUGH), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LOCKSCREEN_BLUR_RADIUS), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.LOCKSCREEN_NOTIFICATIONS), false, this);
         }
 
         @Override
@@ -152,15 +144,7 @@ public class KeyguardViewManager {
                 Settings.System.LOCKSCREEN_SEE_THROUGH, 0) == 1;
         mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.LOCKSCREEN_BLUR_RADIUS, mBlurRadius);
-        mLockscreenNotifications = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_NOTIFICATIONS, mLockscreenNotifications ? 1 : 0) == 1;
         if(!mSeeThrough) mCustomBackground = null;
-        if(mLockscreenNotifications && mNotificationViewManager == null) {
-            mNotificationViewManager = new NotificationViewManager(mContext, this);
-        } else if(!mLockscreenNotifications && mNotificationViewManager != null) {
-            mNotificationViewManager.unregisterListeners();
-            mNotificationViewManager = null;
-        }
     }
 
     /**
@@ -492,7 +476,7 @@ public class KeyguardViewManager {
                 inflateKeyguardView(options);
                 mKeyguardView.requestFocus();
         }
-
+        
         if(mCustomBackground != null) {
             mKeyguardHost.setCustomBackground(mCustomBackground);
         }
@@ -517,19 +501,11 @@ public class KeyguardViewManager {
         mKeyguardView.initializeSwitchingUserState(options != null &&
                 options.getBoolean(IS_SWITCHING_USER));
 
-        if (mLockscreenNotifications) {
-            mNotificationView = (NotificationHostView)mKeyguardView.findViewById(R.id.notification_host_view);
-            mNotificationViewManager.setHostView(mNotificationView);
-            mNotificationViewManager.onScreenTurnedOff();
-        }
-
         // HACK
         // The keyguard view will have set up window flags in onFinishInflate before we set
         // the view mediator callback. Make sure it knows the correct IME state.
         if (mViewMediatorCallback != null) {
-            if (mLockscreenNotifications)
-                mNotificationView.setViewMediator(mViewMediatorCallback);
-
+        	
             KeyguardPasswordView kpv = (KeyguardPasswordView) mKeyguardView.findViewById(
                     R.id.keyguard_password_view);
 
@@ -626,14 +602,15 @@ public class KeyguardViewManager {
         if (mKeyguardView != null) {
             mKeyguardView.onScreenTurnedOff();
         }
-        if (mLockscreenNotifications) {
-            mNotificationViewManager.onScreenTurnedOff();
-        }
     }
 
     public synchronized void onScreenTurnedOn(final IKeyguardShowCallback callback) {
         if (DEBUG) Log.d(TAG, "onScreenTurnedOn()");
         mScreenOn = true;
+
+        if (mLockscreenNotifications) {
+            mNotificationViewManager.onScreenTurnedOn();
+        }
 
         // If keyguard is not showing, we need to inform PhoneWindowManager with a null
         // token so it doesn't wait for us to draw...
@@ -669,10 +646,6 @@ public class KeyguardViewManager {
                         Slog.w(TAG, "Exception calling onShown():", e);
                     }
                 }
-
-                if (mLockscreenNotifications) {
-                    mNotificationViewManager.onScreenTurnedOn();
-                }
             }
         } else if (callback != null) {
             try {
@@ -694,10 +667,6 @@ public class KeyguardViewManager {
      */
     public synchronized void hide() {
         if (DEBUG) Log.d(TAG, "hide()");
-
-        if (mLockscreenNotifications) {
-            mNotificationViewManager.onDismiss();
-        }
 
         if (mKeyguardHost != null) {
             mKeyguardHost.setVisibility(View.GONE);
