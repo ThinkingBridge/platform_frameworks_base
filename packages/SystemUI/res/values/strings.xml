@@ -515,16 +515,25 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     
+    <!-- Off/On/Toggle -->
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="toggle">Toggle</string>
+    
     <!-- Shortcut Actions -->
     <string name="shortcut_picker">Shortcuts</string>
-    <string name="shortcut_immersive">Immersive Mode Toggle</string>
-    <string name="shortcut_quiethours">Quiethours Toggle</string>
-    <string name="shortcut_rotation">Rotation Lock Toggle</string>
+    <string name="shortcut_immersive">Immersive Mode</string>
+    <string name="shortcut_quiethours">Quiethours</string>
+    <string name="shortcut_rotation">Rotation</string>
     <string name="shortcut_torch">Torch Toggle</string>
-    <string name="shortcut_reboot">Reboot (instant)</string>
+    <string name="shortcut_reboot">Reboot</string>
+    <string name="shortcut_recovery">Recovery</string>
     <string name="shortcut_last_app">Last App</string>
+    <string name="shortcut_power_menu">Power Menu</string>
     <string name="shortcut_screenshot">Screenshot</string>
-    <string name="shortcut_screensleep">Sleep Screen</string>
+    <string name="shortcut_screensleep">Go to Sleep</string>
+    <string name="shortcut_volume">Volume</string>
+    <string name="shortcut_toggle_title">Action to perform</string>
     <string name="shortcut_chamber">Chamber of Secrets</string>
     <string name="chamber_disabled">Chamber of secrets is closed</string>
     <string name="chamber_title">Input Settings string</string>
@@ -534,11 +543,7 @@
     <string name="chamber_chk_message">Is this setting a checkbox setting?</string>
     <string name="chamber_int">Input values</string>
     <string name="chamber_int_message">Input the values you\'d like the setting to toggle between. Separate each value with a comma. Color settings accept hex-values such as #FF00aacc or basic color values like red, green, and yellow.</string>
-    
-    <!-- QS Battery Tile -->
-    <string name="quick_settings_battery_charging">Charging</string>
-    <string name="quick_settings_battery_discharging">Discharging</string>
-    
+
     <!-- Quick Settings -->
     <string name="quick_settings_gps">GPS</string>
     <string name="quick_settings_gps_off">GPS off</string>
@@ -578,6 +583,7 @@
     <string name="quick_settings_music_pause">Pause</string>
     <string name="quick_settings_reboot_recovery">Recovery</string>
     <string name="quick_settings_reboot">Reboot</string>
+    <string name="quick_settings_quick_record_nofile">Long-press</string>
     <string name="quick_settings_quick_record_def">Quick Record</string>
     <string name="quick_settings_quick_record_rec">Recording...</string>
     <string name="quick_settings_quick_record_save">Saved</string>
