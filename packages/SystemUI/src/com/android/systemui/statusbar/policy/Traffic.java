@@ -16,22 +16,18 @@ import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
-import android.util.Log;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import android.os.SystemClock;
 
 public class Traffic extends TextView {
     private boolean mAttached;
+    //TrafficStats mTrafficStats;
     boolean showTraffic;
     Handler mHandler;
     Handler mTrafficHandler;
-    float speed;
-    float totalRxBytes;
-
+    long speed;
+    long totalRxBytes;
+    long lastUpdateTime;
+    DecimalFormat decimalFormat = new DecimalFormat("##0.0");
     class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
@@ -40,7 +36,7 @@ public class Traffic extends TextView {
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUS_BAR_TRAFFIC), false, this);
+                .getUriFor(Settings.System.STATUS_BAR_TRAFFIC), false, this);
         }
 
         @Override
@@ -61,6 +57,7 @@ public class Traffic extends TextView {
         super(context, attrs, defStyle);
         mHandler = new Handler();
         SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        //mTrafficStats = new TrafficStats();
         settingsObserver.observe();
         updateSettings();
     }
@@ -74,7 +71,7 @@ public class Traffic extends TextView {
             IntentFilter filter = new IntentFilter();
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
             getContext().registerReceiver(mIntentReceiver, filter, null,
-            		getHandler());
+                getHandler());
         }
         updateSettings();
     }
@@ -91,10 +88,10 @@ public class Traffic extends TextView {
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                updateSettings();
-            }
+                String action = intent.getAction();
+                if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+                    updateSettings();
+                }
         }
     };
 
@@ -102,64 +99,37 @@ public class Traffic extends TextView {
         mTrafficHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                    speed = (getTotalReceivedBytes() - totalRxBytes) / 1024;
-                    totalRxBytes = getTotalReceivedBytes();
-                    if (speed >= 0) {
-                        DecimalFormat DecimalFormatfnum = new DecimalFormat("##0");
-                        if (speed / 1024 >= 1) {
-                                setText(DecimalFormatfnum.format(speed / 1024) + "MB/s");
-                        } else if (speed <= 1) {
-                                setText(DecimalFormatfnum.format(speed * 1024) + "B/s");
-                        } else {
-                                setText(DecimalFormatfnum.format(speed) + "KB/s");
-                        }
-                    }
-                    update();
-                    super.handleMessage(msg);
+                long td = SystemClock.elapsedRealtime() - lastUpdateTime;
+
+                if (td == 0) {
+                    // we just updated the view, nothing further to do
+                    return;
+                }
+
+                speed = (TrafficStats.getTotalRxBytes() - totalRxBytes) * 1000 / td;
+                totalRxBytes = TrafficStats.getTotalRxBytes();
+                lastUpdateTime = SystemClock.elapsedRealtime();
+
+                if (((float) speed) / 1048576 >= 1) { // 1024 * 1024
+                    setText(decimalFormat.format(((float) speed) / 1048576f) + "MB/s");
+                } else if (((float) speed) / 1024f >= 1) {
+                    setText(decimalFormat.format(((float) speed) / 1024f) + "KB/s");
+                } else {
+                    setText(speed + "B/s");
+                }
+                update();
+                super.handleMessage(msg);
             }
         };
-        totalRxBytes = getTotalReceivedBytes();
+        totalRxBytes = TrafficStats.getTotalRxBytes();
+        lastUpdateTime = SystemClock.elapsedRealtime();
         mTrafficHandler.sendEmptyMessage(0);
-    }
-
-    private int getTotalReceivedBytes() {
-        String line;
-        String[] segs;
-        int received = 0;
-        int i;
-        int tmp = 0;
-        boolean isNum;
-        try {
-            FileReader fr = new FileReader("/proc/net/dev");
-            BufferedReader in = new BufferedReader(fr, 500);
-            while ((line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("rmnet") || line.startsWith("eth") || line.startsWith("wlan")) {
-                    segs = line.split(":")[1].split(" ");
-                    for (i = 0; i < segs.length; i++) {
-                        isNum = true;
-                        try {
-                            tmp = Integer.parseInt(segs[i]);
-                        } catch (Exception e) {
-                            isNum = false;
-                        }
-                        if (isNum == true) {
-                            received = received + tmp;
-                            break;
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            return -1;
-        }
-        return received;
     }
 
     private boolean getConnectAvailable() {
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) mContext
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivityManager.getActiveNetworkInfo().isConnected())
                 return true;
             else
@@ -184,9 +154,11 @@ public class Traffic extends TextView {
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
         showTraffic = (Settings.System.getInt(resolver,
-        		Settings.System.STATUS_BAR_TRAFFIC, 1) == 1);
+            Settings.System.STATUS_BAR_TRAFFIC, 1) == 1);
         if (showTraffic && getConnectAvailable()) {
-            updateTraffic();                     
+            if (mAttached) {
+                updateTraffic();
+            }
             setVisibility(View.VISIBLE);
         } else {
             setVisibility(View.GONE);
