@@ -2581,6 +2581,22 @@ public final class Settings {
         public static final String EGG_MODE = "egg_mode";
         
         /**
+         * Eco mode
+         * @hide
+         */
+        public static final String ECO_MODE_ENABLED = "eco_mode_enabled";
+
+        /**
+         * @hide
+         */
+        public static final String ECO_MODE_GPS = "eco_mode_gps";
+
+        /**
+         * @hide
+         */
+        public static final String ECO_MODE_MOBILE_DATA = "eco_mode_mobile_data";
+        
+        /**
          * Allows to show the background activity back the lockscreen
          * @hide
          */

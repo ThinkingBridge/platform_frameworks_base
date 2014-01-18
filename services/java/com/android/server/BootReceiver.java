@@ -17,6 +17,7 @@
 package com.android.server;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,7 +31,9 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemProperties;
 import android.provider.Downloads;
+import android.provider.Settings;
 import android.util.Slog;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
