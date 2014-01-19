@@ -1003,12 +1003,16 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 
         // listen for USER_SETUP_COMPLETE setting (per-user)
         resetUserSetupObserver();
+        
+        mNotificationShortcutsLayout.setupShortcuts();
+        
         mVelocityTracker = VelocityTracker.obtain();
         mBattery = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
         updateBatteryIcons();
 
-        mNotificationShortcutsLayout.setupShortcuts();
+        mNetworkController.setListener(this);
+        updateCarrierAndWifiLabelVisibility(true);
 
         return mStatusBarView;
     }
