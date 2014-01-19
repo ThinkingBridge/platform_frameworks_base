@@ -91,4 +91,11 @@ class QuickSettingsBasicTile extends QuickSettingsTileView {
         mLoadingView.setVisibility(loading ? View.VISIBLE : View.GONE);
         mImageView.setVisibility(loading ? View.GONE : View.VISIBLE);
     }
+
+    public void setEditMode(boolean enabled) {
+        // No hover on edit mode
+        setBackgroundResource(enabled ? R.drawable.qs_tile_background_no_hover :
+                R.drawable.qs_tile_background);
+        super.setEditMode(enabled);
+    }
 }

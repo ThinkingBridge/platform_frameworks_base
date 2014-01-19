@@ -191,6 +191,14 @@ class QuickSettingsTileView extends FrameLayout {
         });
     }
 
+    void fadeOut() {
+        animate().alpha(0.05f);
+    }
+
+    void fadeIn() {
+        animate().alpha(1f);
+    }
+
     void setEditModeClickListener(OnClickListener listener) {
         super.setOnClickListener(listener);
     }

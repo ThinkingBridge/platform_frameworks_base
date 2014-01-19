@@ -52,7 +52,9 @@ class QuickSettingsTouchListener implements OnTouchListener {
                 ClipData data = ClipData.newPlainText("", "");
                 DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
                 mVibrator.vibrate(50);
+                view.getParent().requestDisallowInterceptTouchEvent(true);
                 view.startDrag(data, shadowBuilder, view, 0);
+                ((QuickSettingsTileView) view).fadeOut();
                 return true;
             }
             return false;
