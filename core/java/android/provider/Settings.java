@@ -2856,6 +2856,13 @@ public final class Settings {
          * @hide
          */
         public static final String QS_COLLAPSE_PANEL = "qs_collapse_panel";
+        
+       /**
+        * Quick Settings Smart Pulldown
+        *
+        * @hide
+        */
+       public static final String QS_SMART_PULLDOWN = "qs_smart_pulldown";
 
         /**
          * Electronic beam animation mode
