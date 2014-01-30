@@ -49,199 +49,27 @@ public class RecentsActivity extends Activity {
     private boolean mShowing;
     private boolean mForeground;
 
-    private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (CLOSE_RECENTS_INTENT.equals(intent.getAction())) {
-                if (mRecentsPanel != null && mRecentsPanel.isShowing()) {
-                    if (mShowing && !mForeground) {
-                        // Captures the case right before we transition to another activity
-                        mRecentsPanel.show(false);
-                    }
-                }
-            } else if (WINDOW_ANIMATION_START_INTENT.equals(intent.getAction())) {
-                if (mRecentsPanel != null) {
-                    mRecentsPanel.onWindowAnimationStart();
-                }
-            }
-        }
-    };
-
-    public class TouchOutsideListener implements View.OnTouchListener {
-        private StatusBarPanel mPanel;
-
-        public TouchOutsideListener(StatusBarPanel panel) {
-            mPanel = panel;
-        }
-
-        public boolean onTouch(View v, MotionEvent ev) {
-            final int action = ev.getAction();
-            if (action == MotionEvent.ACTION_OUTSIDE
-                    || (action == MotionEvent.ACTION_DOWN
-                    && !mPanel.isInContentArea((int) ev.getX(), (int) ev.getY()))) {
-                dismissAndGoHome();
-                return true;
-            }
-            return false;
-        }
-    }
-
     @Override
-    public void onPause() {
-        overridePendingTransition(
-                R.anim.recents_return_to_launcher_enter,
-                R.anim.recents_return_to_launcher_exit);
-        mForeground = false;
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        mShowing = false;
-        if (mRecentsPanel != null) {
-            mRecentsPanel.onUiHidden();
-        }
-        super.onStop();
-    }
-
-    private void updateWallpaperVisibility(boolean visible) {
-        int wpflags = visible ? WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER : 0;
-        int curflags = getWindow().getAttributes().flags
-                & WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
-        if (wpflags != curflags) {
-            getWindow().setFlags(wpflags, WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
-        }
-    }
-
-    public static boolean forceOpaqueBackground(Context context) {
-        return WallpaperManager.getInstance(context).getWallpaperInfo() != null;
-    }
-
-    @Override
-    public void onStart() {
-        // Hide wallpaper if it's not a static image
-        if (forceOpaqueBackground(this)) {
-            updateWallpaperVisibility(false);
-        } else {
-            updateWallpaperVisibility(true);
-        }
-        mShowing = true;
-        if (mRecentsPanel != null) {
-            // Call and refresh the recent tasks list in case we didn't preload tasks
-            // or in case we don't get an onNewIntent
-            mRecentsPanel.refreshRecentTasksList();
-            mRecentsPanel.refreshViews();
-        }
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        mForeground = true;
-        super.onResume();
-    }
-
-    @Override
-    public void onBackPressed() {
-        dismissAndGoBack();
-    }
-
-    public void dismissAndGoHome() {
-        if (mRecentsPanel != null) {
-            Intent homeIntent = new Intent(Intent.ACTION_MAIN, null);
-            homeIntent.addCategory(Intent.CATEGORY_HOME);
-            homeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivityAsUser(homeIntent, new UserHandle(UserHandle.USER_CURRENT));
-            mRecentsPanel.show(false);
-        }
-    }
-
-    public void dismissAndGoBack() {
-        if (mRecentsPanel != null) {
-            final ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-
-            final List<ActivityManager.RecentTaskInfo> recentTasks =
-                    am.getRecentTasks(2,
-                            ActivityManager.RECENT_WITH_EXCLUDED |
-                            ActivityManager.RECENT_IGNORE_UNAVAILABLE);
-            if (recentTasks.size() > 1 &&
-                    mRecentsPanel.simulateClick(recentTasks.get(1).persistentId)) {
-                // recents panel will take care of calling show(false) through simulateClick
-                return;
-            }
-            mRecentsPanel.show(false);
-        }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        startActivity(getPackageManager().getLaunchIntentForPackage(
+                "com.example.multitasking"));
         finish();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-    	getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        setContentView(R.layout.status_bar_recent_panel);
-        mRecentsPanel = (RecentsPanelView) findViewById(R.id.recents_root);
-        mRecentsPanel.setOnTouchListener(new TouchOutsideListener(mRecentsPanel));
-        mRecentsPanel.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+    public void dismissAndGoHome() {
 
-        final RecentTasksLoader recentTasksLoader = RecentTasksLoader.getInstance(this);
-        recentTasksLoader.setRecentsPanel(mRecentsPanel, mRecentsPanel);
-        mRecentsPanel.setMinSwipeAlpha(
-                getResources().getInteger(R.integer.config_recent_item_min_alpha) / 100f);
-
-        if (savedInstanceState == null ||
-                savedInstanceState.getBoolean(WAS_SHOWING)) {
-            handleIntent(getIntent(), (savedInstanceState == null));
-        }
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(CLOSE_RECENTS_INTENT);
-        mIntentFilter.addAction(WINDOW_ANIMATION_START_INTENT);
-        registerReceiver(mIntentReceiver, mIntentFilter);
-        super.onCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(WAS_SHOWING, mRecentsPanel.isShowing());
+    public void dismissAndGoBack() {
+
     }
 
-    @Override
-    protected void onDestroy() {
-        RecentTasksLoader.getInstance(this).setRecentsPanel(null, mRecentsPanel);
-        unregisterReceiver(mIntentReceiver);
-        super.onDestroy();
+    public boolean isActivityShowing() {
+        return false;
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent, true);
-    }
-
-    private void handleIntent(Intent intent, boolean checkWaitingForAnimationParam) {
-        super.onNewIntent(intent);
-
-        if (TOGGLE_RECENTS_INTENT.equals(intent.getAction())) {
-            if (mRecentsPanel != null) {
-                if (mRecentsPanel.isShowing()) {
-                    dismissAndGoBack();
-                } else {
-                    final RecentTasksLoader recentTasksLoader = RecentTasksLoader.getInstance(this);
-                    boolean waitingForWindowAnimation = checkWaitingForAnimationParam &&
-                            intent.getBooleanExtra(WAITING_FOR_WINDOW_ANIMATION_PARAM, false);
-                    mRecentsPanel.show(true, recentTasksLoader.getLoadedTasks(),
-                            recentTasksLoader.isFirstScreenful(), waitingForWindowAnimation);
-                }
-            }
-        }
-    }
-
-    boolean isForeground() {
-        return mForeground;
-    }
-
-    boolean isActivityShowing() {
-         return mShowing;
+    public static boolean forceOpaqueBackground(Context mContext) {
+        return false;
     }
 }
