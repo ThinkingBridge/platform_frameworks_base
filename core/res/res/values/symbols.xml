@@ -1805,5 +1805,13 @@
   <java-symbol type="string" name="global_actions_expanded_desktop_mode_on_status" />
   <java-symbol type="string" name="global_actions_expanded_desktop_mode_off_status" />
   <java-symbol type="drawable" name="ic_lock_expanded_desktop" />
+  
+  <!-- Quick settings -->
+  <java-symbol type="string" name="hour" />
+  <java-symbol type="string" name="hours" />
+  <java-symbol type="string" name="minute" />
+  <java-symbol type="string" name="minutes" />
+  <java-symbol type="string" name="second" />
+  <java-symbol type="string" name="seconds" />
 
 </resources>
