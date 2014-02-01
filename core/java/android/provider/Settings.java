@@ -2592,13 +2592,6 @@ public final class Settings {
          */
          public static final String LOCKSCREEN_BLUR_BEHIND = "lockscreen_blur_behind";
          public static final String LOCKSCREEN_BLUR_RADIUS = "lockscreen_blur_radius";
-         
-        /**
-         * 0 = no
-         * 1 = yes
-         * @hide
-         */
-         public static final String IMMERSIVE_MODE = "immersive_mode";
 
         /**
          * Show or hide clock
@@ -2667,19 +2660,6 @@ public final class Settings {
          * Whether to control brightness from status bar
          */
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
-
-        /**
-         * Navigation controls to Use
-         *
-         * @hide
-         */
-        public static final String NAV_BUTTONS = "nav_buttons";
-
-        /**
-         * Quick settings tiles to show on status bar
-         * @hide
-         */
-        public static final String QUICK_SETTINGS_TILES = "quick_settings_tiles";
 
         /**
          * Whether to wake the screen with the volume keys, the value is boolean.

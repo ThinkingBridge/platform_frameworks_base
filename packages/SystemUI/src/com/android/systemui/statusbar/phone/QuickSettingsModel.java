@@ -18,7 +18,6 @@ package com.android.systemui.statusbar.phone;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothAdapter.BluetoothStateChangeCallback;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -26,19 +25,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.SyncStatusObserver;
 import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
-import android.hardware.usb.UsbManager;
-import android.media.AudioManager;
 import android.media.MediaRouter;
 import android.media.MediaRouter.RouteInfo;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiInfo;
 import android.os.Handler;
 import android.os.UserHandle;
-import android.os.Vibrator;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
@@ -47,10 +40,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputMethodSubtype;
-import com.android.internal.telephony.Phone;
 
-import com.android.internal.util.thinkingbridge.DeviceUtils;
-import com.android.internal.util.thinkingbridge.LightbulbConstants;
 import com.android.systemui.R;
 import com.android.systemui.settings.BrightnessController.BrightnessStateChangeCallback;
 import com.android.systemui.settings.CurrentUserTracker;
@@ -60,9 +50,7 @@ import com.android.systemui.statusbar.policy.NetworkController.NetworkSignalChan
 import com.android.systemui.statusbar.policy.RotationLockController;
 import com.android.systemui.statusbar.policy.RotationLockController.RotationLockControllerCallback;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 class QuickSettingsModel implements BluetoothStateChangeCallback,
         NetworkSignalChangedCallback,
@@ -92,7 +80,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         String signalContentDescription;
         int dataTypeIconId;
         String dataContentDescription;
-        String networkType;
     }
     static class WifiState extends ActivityState {
         String signalContentDescription;
@@ -151,64 +138,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
                 onAlarmChanged(intent);
                 onNextAlarmChanged();
             }
-        }
-    };
-
-    /** Broadcast receive to determine lightbulb state. */
-    private BroadcastReceiver mLightbulbReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mLightbulbActive = intent.getIntExtra(LightbulbConstants.EXTRA_CURRENT_STATE, 0) != 0;
-            onLightbulbChanged();
-        }
-    };
-    
-    /** Broadcast receive to determine ringer. */
-    private BroadcastReceiver mRingerIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(AudioManager.RINGER_MODE_CHANGED_ACTION)) {
-                updateRingerState();
-            }
-        }
-    };
-
-    /** ContentObserver to determine the ringer */
-    private class RingerObserver extends ContentObserver {
-        public RingerObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override 
-        public void onChange(boolean selfChange) {
-            updateRingerState();
-        }
-
-        public void startObserving() {
-            final ContentResolver cr = mContext.getContentResolver();
-            cr.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.VIBRATE_WHEN_RINGING), false, this,
-                    UserHandle.USER_ALL);
-        }
-    }
-
-    /** Broadcast receive to determine usb tether. */
-    private BroadcastReceiver mUsbIntentReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(UsbManager.ACTION_USB_STATE)) {
-                mUsbConnected = intent.getBooleanExtra(UsbManager.USB_CONNECTED, false);
-            }
-
-            if (intent.getAction().equals(Intent.ACTION_MEDIA_SHARED)) {
-                mMassStorageActive = true;
-            }
-
-            if (intent.getAction().equals(Intent.ACTION_MEDIA_UNSHARED)) {
-                mMassStorageActive = false;
-            }
-
-            onUsbChanged();
         }
     };
 
@@ -300,33 +229,11 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private final NextAlarmObserver mNextAlarmObserver;
     private final BugreportObserver mBugreportObserver;
     private final BrightnessObserver mBrightnessObserver;
-    private final RingerObserver mRingerObserver;
-
-    private boolean mUsbTethered = false;
-    private boolean mUsbConnected = false;
-    private boolean mMassStorageActive = false;
-    private String[] mUsbRegexs;
-    private Object mSyncObserverHandle = null;
-    private ConnectivityManager mCM;
-    
-    private static final Ringer[] RINGERS = new Ringer[] {
-        new Ringer(AudioManager.RINGER_MODE_SILENT, false, R.drawable.ic_qs_ring_off, R.string.quick_settings_ringer_off),
-        new Ringer(AudioManager.RINGER_MODE_VIBRATE, true, R.drawable.ic_qs_vibrate_on, R.string.quick_settings_vibration_on),
-        new Ringer(AudioManager.RINGER_MODE_NORMAL, false, R.drawable.ic_qs_ring_on, R.string.quick_settings_ringer_on),
-        new Ringer(AudioManager.RINGER_MODE_NORMAL, true, R.drawable.ic_qs_ring_vibrate_on, R.string.quick_settings_ringer_normal)
-    };
-    
-    private ArrayList<Ringer> mRingers;
-    private int mRingerIndex;
-
-    private AudioManager mAudioManager;
-    private Vibrator mVibrator;
 
     private final MediaRouter mMediaRouter;
     private final RemoteDisplayRouteCallback mRemoteDisplayRouteCallback;
 
     private final boolean mHasMobileData;
-    protected boolean mLightbulbActive;
 
     private QuickSettingsTileView mUserTile;
     private RefreshCallback mUserCallback;
@@ -343,25 +250,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private QuickSettingsTileView mAirplaneModeTile;
     private RefreshCallback mAirplaneModeCallback;
     private State mAirplaneModeState = new State();
-    
-    private QuickSettingsTileView mSyncModeTile;
-    private RefreshCallback mSyncModeCallback;
-    private State mSyncModeState = new State();
-    
-    private QuickSettingsTileView mRingerModeTile;
-    private RefreshCallback mRingerModeCallback;
-    private State mRingerModeState = new State();
-
-    private QuickSettingsTileView mUsbModeTile;
-    private RefreshCallback mUsbModeCallback;
-    private State mUsbModeState = new State();
 
     private QuickSettingsTileView mWifiTile;
-    private QuickSettingsTileView mWifiBackTile;
     private RefreshCallback mWifiCallback;
-    private RefreshCallback mWifiBackCallback;
     private WifiState mWifiState = new WifiState();
-    private WifiState mWifiBackState = new WifiState();
 
     private QuickSettingsTileView mRemoteDisplayTile;
     private RefreshCallback mRemoteDisplayCallback;
@@ -372,11 +264,8 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private RSSIState mRSSIState = new RSSIState();
 
     private QuickSettingsTileView mBluetoothTile;
-    private QuickSettingsTileView mBluetoothBackTile;
     private RefreshCallback mBluetoothCallback;
-    private RefreshCallback mBluetoothBackCallback;
     private BluetoothState mBluetoothState = new BluetoothState();
-    private BluetoothState mBluetoothBackState = new BluetoothState();
 
     private QuickSettingsTileView mBatteryTile;
     private RefreshCallback mBatteryCallback;
@@ -409,23 +298,8 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private QuickSettingsTileView mSslCaCertWarningTile;
     private RefreshCallback mSslCaCertWarningCallback;
     private State mSslCaCertWarningState = new State();
-    
-    private QuickSettingsTileView mLightbulbTile;
-    private RefreshCallback mLightbulbCallback;
-    private State mLightbulbState = new State();
 
     private RotationLockController mRotationLockController;
-    
-    private SyncStatusObserver mSyncObserver = new SyncStatusObserver() {
-    	public void onStatusChanged(int which) {
-    		mHandler.post(new Runnable() {
-    			@Override
-    			public void run() {
-    				updateSyncState();
-    			}
-    		});
-    	}
-    };
 
     public QuickSettingsModel(Context context) {
         mContext = context;
@@ -439,8 +313,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
                 onNextAlarmChanged();
                 onBugreportChanged();
                 rebindMediaRouterAsCurrentUser();
-                onUsbChanged();
-                updateRingerState();
             }
         };
 
@@ -450,47 +322,19 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mBugreportObserver.startObserving();
         mBrightnessObserver = new BrightnessObserver(mHandler);
         mBrightnessObserver.startObserving();
-        mRingerObserver = new RingerObserver(mHandler);
-        mRingerObserver.startObserving();
 
         mMediaRouter = (MediaRouter)context.getSystemService(Context.MEDIA_ROUTER_SERVICE);
         rebindMediaRouterAsCurrentUser();
 
         mRemoteDisplayRouteCallback = new RemoteDisplayRouteCallback();
 
-        mCM = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        mHasMobileData = mCM.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        mHasMobileData = cm.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
 
         IntentFilter alarmIntentFilter = new IntentFilter();
         alarmIntentFilter.addAction(Intent.ACTION_ALARM_CHANGED);
         context.registerReceiver(mAlarmIntentReceiver, alarmIntentFilter);
-        
-        IntentFilter usbIntentFilter = new IntentFilter();
-        usbIntentFilter.addAction(ConnectivityManager.ACTION_TETHER_STATE_CHANGED);
-        usbIntentFilter.addAction(UsbManager.ACTION_USB_STATE);
-        usbIntentFilter.addAction(Intent.ACTION_MEDIA_SHARED);
-        usbIntentFilter.addAction(Intent.ACTION_MEDIA_UNSHARED);
-        context.registerReceiver(mUsbIntentReceiver, usbIntentFilter);
-
-        IntentFilter ringerIntentFilter = new IntentFilter();
-        ringerIntentFilter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);
-        context.registerReceiver(mRingerIntentReceiver, ringerIntentFilter);
-
-        IntentFilter lightbulbFilter = new IntentFilter();
-        lightbulbFilter.addAction(LightbulbConstants.ACTION_STATE_CHANGED);
-        context.registerReceiver(mLightbulbReceiver, lightbulbFilter);
-        
-        if(mSyncObserverHandle != null) {
-        	ContentResolver.removeStatusChangeListener(mSyncObserverHandle);
-        	mSyncObserverHandle = null;
-        } else {
-        	mSyncObserverHandle = ContentResolver.addStatusChangeListener(
-        			ContentResolver.SYNC_OBSERVER_TYPE_SETTINGS, mSyncObserver);
-        }
-        
-        mRingers = new ArrayList<Ringer>();
-        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     void updateResources() {
@@ -557,40 +401,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mAlarmCallback.refreshView(mAlarmTile, mAlarmState);
     }
 
-    // Usb Mode
-    void addUsbModeTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mUsbModeTile = view;
-        mUsbModeTile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mUsbConnected) {
-                    setUsbTethering(!mUsbTethered);
-                }
-            }
-        });
-        mUsbModeCallback = cb;
-        onUsbChanged();
-    }
-
-    void onUsbChanged() {
-        updateState();
-        if (mUsbConnected && !mMassStorageActive) {
-            if (mUsbTethered) {
-                mUsbModeState.iconId = R.drawable.ic_qs_usb_tether_on;
-                mUsbModeState.label =
-                        mContext.getString(R.string.quick_settings_usb_tether_on_label);
-            } else {
-                mUsbModeState.iconId = R.drawable.ic_qs_usb_tether_connected;
-                mUsbModeState.label =
-                        mContext.getString(R.string.quick_settings_usb_tether_connected_label);
-            }
-            mUsbModeState.enabled = true;
-        } else {
-            mUsbModeState.enabled = false;
-        }
-        mUsbModeCallback.refreshView(mUsbModeTile, mUsbModeState);
-    }
-
     // Airplane Mode
     void addAirplaneModeTile(QuickSettingsTileView view, RefreshCallback cb) {
         mAirplaneModeTile = view;
@@ -633,51 +443,12 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mAirplaneModeState.label = r.getString(R.string.quick_settings_airplane_mode_label);
         mAirplaneModeCallback.refreshView(mAirplaneModeTile, mAirplaneModeState);
     }
-    
-    // Sync Mode
-    void addSyncModeTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mSyncModeTile = view;
-        mSyncModeTile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getSyncState()) {
-                    ContentResolver.setMasterSyncAutomatically(false);
-                } else {
-                    ContentResolver.setMasterSyncAutomatically(true);
-                }
-                updateSyncState();
-            }
-        });
-        mSyncModeCallback = cb;
-        updateSyncState();
-    }
-
-    private boolean getSyncState() {
-        return ContentResolver.getMasterSyncAutomatically();
-    }
-
-    private void updateSyncState() {
-        Resources r = mContext.getResources();
-        mSyncModeState.enabled = getSyncState();
-        mSyncModeState.iconId = (getSyncState() ?
-                R.drawable.ic_qs_sync_on :
-                R.drawable.ic_qs_sync_off);
-        mSyncModeState.label = (getSyncState() ?
-                r.getString(R.string.quick_settings_sync) :
-                r.getString(R.string.quick_settings_sync_off));
-        mSyncModeCallback.refreshView(mSyncModeTile, mSyncModeState);
-    }
 
     // Wifi
     void addWifiTile(QuickSettingsTileView view, RefreshCallback cb) {
         mWifiTile = view;
         mWifiCallback = cb;
         mWifiCallback.refreshView(mWifiTile, mWifiState);
-    }
-    void addWifiBackTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mWifiBackTile = view;
-        mWifiBackCallback = cb;
-        mWifiCallback.refreshView(mWifiBackTile, mWifiBackState);
     }
     // Remove the double quotes that the SSID may contain
     public static String removeDoubleQuotes(String string) {
@@ -715,52 +486,20 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mWifiState.iconId = wifiSignalIconId;
             mWifiState.label = removeDoubleQuotes(enabledDesc);
             mWifiState.signalContentDescription = wifiSignalContentDescription;
-            
-            mWifiBackState.iconId = wifiSignalIconId;
-            mWifiBackState.label = getWifiIpAddr();
-            mWifiBackState.signalContentDescription = wifiSignalContentDescription;
         } else if (wifiNotConnected) {
             mWifiState.iconId = R.drawable.ic_qs_wifi_0;
             mWifiState.label = r.getString(R.string.quick_settings_wifi_label);
             mWifiState.signalContentDescription = r.getString(R.string.accessibility_no_wifi);
-            
-            mWifiBackState.iconId = mWifiState.iconId;
-            mWifiBackState.label = mWifiState.label;
-            mWifiBackState.signalContentDescription = mWifiState.signalContentDescription;
         } else {
             mWifiState.iconId = R.drawable.ic_qs_wifi_no_network;
             mWifiState.label = r.getString(R.string.quick_settings_wifi_off_label);
             mWifiState.signalContentDescription = r.getString(R.string.accessibility_wifi_off);
-            
-            mWifiBackState.iconId = mWifiState.iconId;
-            mWifiBackState.label = mWifiState.label;
-            mWifiBackState.signalContentDescription = mWifiState.signalContentDescription;
         }
         mWifiCallback.refreshView(mWifiTile, mWifiState);
-        mWifiBackCallback.refreshView(mWifiBackTile, mWifiBackState);
-    }
-    
-    String getWifiIpAddr() {
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int ip = wifiInfo.getIpAddress();
-
-        String ipString = String.format(
-            "%d.%d.%d.%d",
-            (ip & 0xff),
-            (ip >> 8 & 0xff),
-            (ip >> 16 & 0xff),
-            (ip >> 24 & 0xff));
-
-        return ipString;
     }
 
     boolean deviceHasMobileData() {
         return mHasMobileData;
-    }
-    
-    boolean deviceHasCameraFlash() {
-    	return DeviceUtils.deviceSupportsCameraFlash();
     }
 
     // RSSI
@@ -795,54 +534,8 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mRSSIState.label = enabled
                     ? removeTrailingPeriod(enabledDesc)
                     : r.getString(R.string.quick_settings_rssi_emergency_only);
-                    mRSSIState.networkType = getNetworkType(r);
             mRSSICallback.refreshView(mRSSITile, mRSSIState);
         }
-    }
-    
-    private String getNetworkType(Resources r) {
-        int state = networkModeToState(get2G3G());
-        switch (state) {
-            case 1:
-                return r.getString(R.string.network_2G);
-            case 2:
-                return r.getString(R.string.network_3G_only);
-            case 3:
-                return r.getString(R.string.network_3G_auto);
-            case 4:
-                return r.getString(R.string.network_3G);
-        }
-        return "global";
-    }
-
-    private int get2G3G() {
-        int state = 99;
-        try {
-            state = Settings.Global.getInt(mContext.getContentResolver(),
-                    Settings.Global.PREFERRED_NETWORK_MODE);
-        } catch (SettingNotFoundException e) {
-            // Do nothing
-        }
-        return state;
-    }
-
-    private int networkModeToState(int what) {
-        switch (what) {
-            case Phone.NT_MODE_WCDMA_PREF:
-                return 4;
-            case Phone.NT_MODE_GSM_UMTS:
-                return 3;
-            case Phone.NT_MODE_WCDMA_ONLY:
-                return 2;
-            case Phone.NT_MODE_GSM_ONLY:
-                return 1;
-            case Phone.NT_MODE_CDMA:
-            case Phone.NT_MODE_CDMA_NO_EVDO:
-            case Phone.NT_MODE_EVDO_NO_CDMA:
-            case Phone.NT_MODE_GLOBAL:
-                return 0;
-        }
-        return 0;
     }
 
     void refreshRssiTile() {
@@ -863,16 +556,6 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mBluetoothState.connected =
                 (adapter.getConnectionState() == BluetoothAdapter.STATE_CONNECTED);
         onBluetoothStateChange(mBluetoothState);
-    }
-    void addBluetoothBackTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mBluetoothBackTile = view;
-        mBluetoothBackCallback = cb;
-
-        final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothBackState.enabled = adapter.isEnabled();
-        mBluetoothBackState.connected =
-                (adapter.getConnectionState() == BluetoothAdapter.STATE_CONNECTED);
-        onBluetoothStateChange(mBluetoothBackState);
     }
     boolean deviceSupportsBluetooth() {
         return (BluetoothAdapter.getDefaultAdapter() != null);
@@ -902,27 +585,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mBluetoothState.label = r.getString(R.string.quick_settings_bluetooth_off_label);
             mBluetoothState.stateContentDescription = r.getString(R.string.accessibility_desc_off);
         }
-
-        // Back tile: Show paired devices
-        if (mBluetoothBackTile != null) {
-            mBluetoothBackState.iconId = mBluetoothState.iconId;
-
-            final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            Set<BluetoothDevice> btDevices = adapter.getBondedDevices();
-            if (btDevices.size() == 1) {
-                // Show a generic label about the number of paired bluetooth devices
-                mBluetoothBackState.label = 
-                    r.getString(R.string.quick_settings_bluetooth_number_paired, btDevices.size());
-            } else {
-                mBluetoothBackState.label = r.getString(R.string.quick_settings_bluetooth_disabled);
-            }
-        }
-
         mBluetoothCallback.refreshView(mBluetoothTile, mBluetoothState);
-        
-        if (mBluetoothBackTile != null) {
-            mBluetoothBackCallback.refreshView(mBluetoothBackTile, mBluetoothBackState);
-        }
     }
     void refreshBluetoothTile() {
         if (mBluetoothTile != null) {
@@ -1204,144 +867,5 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
         mSslCaCertWarningState.label = r.getString(R.string.ssl_ca_cert_warning);
         mSslCaCertWarningCallback.refreshView(mSslCaCertWarningTile, mSslCaCertWarningState);
-    }
-
-    // Lightbulb
-    void addLightbulbTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mLightbulbTile = view;
-        mLightbulbCallback = cb;
-        onLightbulbChanged();
-    }
-
-    void onLightbulbChanged() {
-        if (mLightbulbActive) {
-            mLightbulbState.iconId = R.drawable.ic_qs_lightbulb_on;
-            mLightbulbState.label = mContext.getString(R.string.quick_settings_lightbulb_label);
-        } else {
-            mLightbulbState.iconId = R.drawable.ic_qs_lightbulb_off;
-            mLightbulbState.label = mContext.getString(R.string.quick_settings_lightbulb_off_label);
-        }
-        mLightbulbState.enabled = mLightbulbActive;
-        mLightbulbCallback.refreshView(mLightbulbTile, mLightbulbState);
-    }
-
-    private void updateState() {
-        mUsbRegexs = mCM.getTetherableUsbRegexs();
-
-        String[] available = mCM.getTetherableIfaces();
-        String[] tethered = mCM.getTetheredIfaces();
-        String[] errored = mCM.getTetheringErroredIfaces();
-        updateState(available, tethered, errored);
-    }
-
-    private void updateState(String[] available, String[] tethered,
-            String[] errored) {
-        updateUsbState(available, tethered, errored);
-    }
-
-    private void updateUsbState(String[] available, String[] tethered,
-            String[] errored) {
-
-        mUsbTethered = false;
-        for (String s : tethered) {
-            for (String regex : mUsbRegexs) {
-                if (s.matches(regex)) mUsbTethered = true;
-            }
-        }
-
-    }
-
-    private void setUsbTethering(boolean enabled) {
-        if (mCM.setUsbTethering(enabled) != ConnectivityManager.TETHER_ERROR_NO_ERROR) {
-            return;
-        }
-    }
-    
-    // Ringer Mode
-    void addRingerModeTile(QuickSettingsTileView view, RefreshCallback cb) {
-        mRingerModeTile = view;
-        mRingerModeTile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleRingerState();
-                updateRingerState();
-            }
-        });
-        mRingerModeCallback = cb;
-        updateRingerState();
-    }
-
-    private void updateRingerState() {
-        updateRingerSettings();
-        findCurrentState();
-        mRingerModeState.enabled = true;
-        mRingerModeState.iconId = mRingers.get(mRingerIndex).mDrawable;
-        mRingerModeState.label = mContext.getString(mRingers.get(mRingerIndex).mString);
-        mRingerModeCallback.refreshView(mRingerModeTile, mRingerModeState);
-    }
-
-    private void findCurrentState() {
-        boolean vibrateWhenRinging = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.VIBRATE_WHEN_RINGING, 0, UserHandle.USER_CURRENT) == 1;
-        int ringerMode = mAudioManager.getRingerMode();
-
-        mRingerIndex = 0;
-
-        for (int i = 0; i < mRingers.size(); i++) {
-            Ringer r = mRingers.get(i);
-            if (ringerMode == r.mRingerMode && vibrateWhenRinging == r.mVibrateWhenRinging) {
-                mRingerIndex = i;
-                break;
-            }
-        }
-    }
-
-    private void updateRingerSettings() {
-        boolean hasVibrator = mVibrator.hasVibrator();
-
-        mRingers.clear();
-
-        for (Ringer r : RINGERS) {
-             if (hasVibrator || !r.mVibrateWhenRinging) {
-                 mRingers.add(r);
-             }
-        }
-        if (mRingers.isEmpty()) {
-            mRingers.add(RINGERS[0]);
-        }
-    }
-
-    private void toggleRingerState() {
-        mRingerIndex++;
-        if (mRingerIndex >= mRingers.size()) {
-            mRingerIndex = 0;
-        }
-
-        Ringer r = mRingers.get(mRingerIndex);
-
-        // If we are setting a vibrating state, vibrate to indicate it
-        if (r.mVibrateWhenRinging) {
-            mVibrator.vibrate(250);
-        }
-
-        // Set the desired state
-        ContentResolver resolver = mContext.getContentResolver();
-        Settings.System.putIntForUser(resolver, Settings.System.VIBRATE_WHEN_RINGING,
-                r.mVibrateWhenRinging ? 1 : 0, UserHandle.USER_CURRENT);
-        mAudioManager.setRingerMode(r.mRingerMode);
-    }
-
-    private static class Ringer {
-        final boolean mVibrateWhenRinging;
-        final int mRingerMode;
-        final int mDrawable;
-        final int mString;
-
-        Ringer(int ringerMode, boolean vibrateWhenRinging, int drawable, int string) {
-            mVibrateWhenRinging = vibrateWhenRinging;
-            mRingerMode = ringerMode;
-            mDrawable = drawable;
-            mString = string;
-        }
     }
 }
