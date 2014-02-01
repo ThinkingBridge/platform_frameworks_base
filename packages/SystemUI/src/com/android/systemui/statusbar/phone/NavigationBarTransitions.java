@@ -78,14 +78,9 @@ public final class NavigationBarTransitions extends BarTransitions {
 
     private void applyMode(int mode, boolean animate, boolean force) {
         // apply to key buttons
-        final boolean isOpaque = mode == MODE_OPAQUE || mode == MODE_LIGHTS_OUT;
-        final float alpha = isOpaque ? KeyButtonView.DEFAULT_QUIESCENT_ALPHA : 1f;
-        final View back = mView.getBackButton();
+        final float alpha = alphaForMode(mode);
         final View home = mView.getHomeButton();
         final View recent = mView.getRecentsButton();
-        if (back != null) {
-            setKeyButtonViewQuiescentAlpha(back, alpha, animate);
-        }
         if (home != null) {
             setKeyButtonViewQuiescentAlpha(home, alpha, animate);
         }
@@ -101,7 +96,11 @@ public final class NavigationBarTransitions extends BarTransitions {
         }
         setKeyButtonViewQuiescentAlpha(mView.getLeftMenuButton(), alpha, animate);
         setKeyButtonViewQuiescentAlpha(mView.getRightMenuButton(), alpha, animate);
-        setKeyButtonViewQuiescentAlpha(mView.getCameraButton(), alpha, animate);
+
+        setKeyButtonViewQuiescentAlpha(mView.getSearchLight(), KEYGUARD_QUIESCENT_ALPHA, animate);
+        setKeyButtonViewQuiescentAlpha(mView.getCameraButton(), KEYGUARD_QUIESCENT_ALPHA, animate);
+
+        applyBackButtonQuiescentAlpha(mode, animate);
 
         // apply to lights out
         applyLightsOut(mode == MODE_LIGHTS_OUT, animate, force);
@@ -114,13 +113,34 @@ public final class NavigationBarTransitions extends BarTransitions {
 
     public void applyBackButtonQuiescentAlpha(int mode, boolean animate) {
         float backAlpha = 0;
+
+        final View back = mView.getBackButton();
+        if (back == null) {
+            // nothing to do here
+            return;
+        }
+
         backAlpha = maxVisibleQuiescentAlpha(backAlpha, mView.getSearchLight());
         backAlpha = maxVisibleQuiescentAlpha(backAlpha, mView.getCameraButton());
-        backAlpha = maxVisibleQuiescentAlpha(backAlpha, mView.getHomeButton());
-        backAlpha = maxVisibleQuiescentAlpha(backAlpha, mView.getRecentsButton());
-        backAlpha = maxVisibleQuiescentAlpha(backAlpha, mView.getMenuButton());
+
+        final View home = mView.getHomeButton();
+        final View recent = mView.getRecentsButton();
+        if (home != null) {
+            backAlpha = maxVisibleQuiescentAlpha(backAlpha, home);
+        }
+        if (recent != null) {
+            backAlpha = maxVisibleQuiescentAlpha(backAlpha, recent);
+        }
+        List<Integer> buttonIdList = mView.getButtonIdList();
+        for (int i = 0; i < buttonIdList.size(); i++) {
+            final View customButton = mView.getCustomButton(buttonIdList.get(i));
+            if (customButton != null) {
+                backAlpha = maxVisibleQuiescentAlpha(backAlpha, customButton);
+            }
+        }
+
         if (backAlpha > 0) {
-            setKeyButtonViewQuiescentAlpha(mView.getBackButton(), backAlpha, animate);
+            setKeyButtonViewQuiescentAlpha(back, backAlpha, animate);
         }
     }
 

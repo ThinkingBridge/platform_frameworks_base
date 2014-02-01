@@ -60,7 +60,7 @@ import android.widget.LinearLayout;
 import com.android.internal.util.slim.ButtonConfig;
 import com.android.internal.util.slim.ButtonsConstants;
 import com.android.internal.util.slim.ButtonsHelper;
-import com.android.internal.util.slim.ColorHelper;
+import com.android.internal.util.slim.ImageHelper;
 import com.android.internal.util.slim.DeviceUtils;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -134,13 +134,14 @@ public class NavigationBarView extends LinearLayout {
 
     // used to disable the camera icon in navbar when disabled by DPM
     private boolean mCameraDisabledByDpm;
+    private boolean mCameraDisabledByUser;
 
     // performs manual animation in sync with layout transitions
     private final NavTransitionListener mTransitionListener = new NavTransitionListener();
 
     private class NavTransitionListener implements TransitionListener {
         private boolean mBackTransitioning;
-        private boolean mHomeAppearing;
+        private boolean mAppearing;
         private long mStartDelay;
         private long mDuration;
         private TimeInterpolator mInterpolator;
@@ -150,8 +151,9 @@ public class NavigationBarView extends LinearLayout {
                 View view, int transitionType) {
             if (view.getId() == R.id.back) {
                 mBackTransitioning = true;
-            } else if (view.getId() == R.id.home && transitionType == LayoutTransition.APPEARING) {
-                mHomeAppearing = true;
+            } else if (view.getId() != R.id.recent_apps
+                    && transitionType == LayoutTransition.APPEARING) {
+                mAppearing = true;
                 mStartDelay = transition.getStartDelay(transitionType);
                 mDuration = transition.getDuration(transitionType);
                 mInterpolator = transition.getInterpolator(transitionType);
@@ -163,8 +165,9 @@ public class NavigationBarView extends LinearLayout {
                 View view, int transitionType) {
             if (view.getId() == R.id.back) {
                 mBackTransitioning = false;
-            } else if (view.getId() == R.id.home && transitionType == LayoutTransition.APPEARING) {
-                mHomeAppearing = false;
+            } else if (view.getId() != R.id.recent_apps
+                    && transitionType == LayoutTransition.APPEARING) {
+                mAppearing = false;
             }
         }
 
@@ -175,8 +178,8 @@ public class NavigationBarView extends LinearLayout {
             final View home = getHomeButton();
             if (!mBackTransitioning
                     && back != null && back.getVisibility() == VISIBLE
-                    && mHomeAppearing
-                    && home != null && home.getAlpha() == 0) {
+                    && mAppearing
+                    && (mDisabledFlags & View.STATUS_BAR_DISABLE_HOME) == 0) {
                 back.setAlpha(0);
                 ValueAnimator a = ObjectAnimator.ofFloat(back, "alpha", 0, 1);
                 a.setStartDelay(mStartDelay);
@@ -210,13 +213,8 @@ public class NavigationBarView extends LinearLayout {
                     break;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-<<<<<<< HEAD
-                    mDelegateHelper.setDisabled(false);
-                    mBarTransitions.setContentVisible(true);
-=======
                     mDelegateHelper.setDisabled(!hasNavringTargets());
-                    transitionCameraAndSearchButtonAlpha(1.0f);
->>>>>>> c26519f... fb: allow navring to show without assisten application
+                    mBarTransitions.setContentVisible(true);
                     break;
             }
             return KeyguardTouchDelegate.getInstance(getContext()).dispatch(event);
@@ -260,6 +258,7 @@ public class NavigationBarView extends LinearLayout {
 
         mBarTransitions = new NavigationBarTransitions(this);
 
+        disableCameraByUser();
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
 
@@ -445,7 +444,7 @@ public class NavigationBarView extends LinearLayout {
         mBackAltIcon = res.getDrawable(R.drawable.ic_sysbar_back_ime);
         if (mNavBarButtonColorMode != 3) {
             mBackAltIcon = new BitmapDrawable(mContext.getResources(),
-                ColorHelper.getColoredBitmap(mBackAltIcon, mNavBarButtonColor));
+                ImageHelper.getColoredBitmap(mBackAltIcon, mNavBarButtonColor));
         }
 
         // now the keyguard searchlight and camera button
@@ -458,7 +457,7 @@ public class NavigationBarView extends LinearLayout {
         if (searchLight != null && defaultSearchLightDrawable != null) {
             if (mNavBarButtonColorMode != 3) {
                 searchLight.setImageBitmap(
-                    ColorHelper.getColoredBitmap(defaultSearchLightDrawable, mNavBarButtonColor));
+                    ImageHelper.getColoredBitmap(defaultSearchLightDrawable, mNavBarButtonColor));
             } else {
                 searchLight.setImageDrawable(defaultSearchLightDrawable);
             }
@@ -466,7 +465,7 @@ public class NavigationBarView extends LinearLayout {
         if (cameraButton != null && defaultCameraButtonDrawable != null) {
             if (mNavBarButtonColorMode != 3) {
                 cameraButton.setImageBitmap(
-                    ColorHelper.getColoredBitmap(defaultCameraButtonDrawable, mNavBarButtonColor));
+                    ImageHelper.getColoredBitmap(defaultCameraButtonDrawable, mNavBarButtonColor));
             } else {
                 cameraButton.setImageDrawable(defaultCameraButtonDrawable);
             }
@@ -521,7 +520,7 @@ public class NavigationBarView extends LinearLayout {
         Drawable d = ButtonsHelper.getButtonIconImage(mContext, clickAction, iconUri);
         if (d != null) {
             if (colorize && mNavBarButtonColorMode != 3) {
-                v.setImageBitmap(ColorHelper.getColoredBitmap(d, mNavBarButtonColor));
+                v.setImageBitmap(ImageHelper.getColoredBitmap(d, mNavBarButtonColor));
             } else {
                 v.setImageDrawable(d);
             }
@@ -573,7 +572,7 @@ public class NavigationBarView extends LinearLayout {
 
         Drawable d = mContext.getResources().getDrawable(R.drawable.ic_sysbar_menu);
         if (mNavBarButtonColorMode != 3) {
-            v.setImageBitmap(ColorHelper.getColoredBitmap(d, mNavBarButtonColor));
+            v.setImageBitmap(ImageHelper.getColoredBitmap(d, mNavBarButtonColor));
         } else {
             v.setImageDrawable(d);
         }
@@ -658,24 +657,11 @@ public class NavigationBarView extends LinearLayout {
         }
 
         mNavigationIconHints = hints;
-        // We can't gaurantee users will set these buttons as targets
+
         final View back = getBackButton();
-        final View home = getHomeButton();
-        final View recent = getRecentsButton();
         if (back != null) {
-            back.setAlpha(
-                    (0 != (hints & StatusBarManager.NAVIGATION_HINT_BACK_NOP)) ? 0.5f : 1.0f);
-            ((ImageView) back).setImageDrawable(
-                    (0 != (hints & StatusBarManager.NAVIGATION_HINT_BACK_ALT))
+            ((ImageView) back).setImageDrawable(backAlt
                     ? mBackAltIcon : mBackIcon);
-        }
-        if (home != null) {
-            home.setAlpha(
-                    (0 != (hints & StatusBarManager.NAVIGATION_HINT_HOME_NOP)) ? 0.5f : 1.0f);
-        }
-        if (recent != null) {
-            recent.setAlpha(
-                    (0 != (hints & StatusBarManager.NAVIGATION_HINT_RECENT_NOP)) ? 0.5f : 1.0f);
         }
 
         setDisabledFlags(mDisabledFlags, true);
@@ -695,8 +681,6 @@ public class NavigationBarView extends LinearLayout {
         final boolean disableBack = ((disabledFlags & View.STATUS_BAR_DISABLE_BACK) != 0)
                 && ((mNavigationIconHints & StatusBarManager.NAVIGATION_HINT_BACK_ALT) == 0);
         final boolean disableSearch = !hasNavringTargets();
-        final boolean keyguardProbablyEnabled =
-                (mDisabledFlags & View.STATUS_BAR_DISABLE_HOME) != 0 && !disableSearch;
 
         mDelegateHelper.setDisabled(disableSearch);
 
@@ -739,17 +723,46 @@ public class NavigationBarView extends LinearLayout {
 
         View searchLight = getSearchLight();
         if (searchLight != null) {
-            searchLight.setVisibility(keyguardProbablyEnabled ? View.VISIBLE : View.GONE);
+            setVisibleOrGone(searchLight, disableHome && !disableSearch);
         }
 
         final boolean shouldShowCamera = disableHome
             && !((disabledFlags & View.STATUS_BAR_DISABLE_SEARCH) != 0);
         final View cameraButton = getCameraButton();
         if (cameraButton != null) {
-            cameraButton.setVisibility(
-                    shouldShowCamera && !mCameraDisabledByDpm ? View.VISIBLE : View.GONE);
+            setVisibleOrGone(cameraButton, shouldShowCamera && !mCameraDisabledByDpm
+                    && !mCameraDisabledByUser);
         }
+
+        mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
+
         setMenuVisibility(mShowMenu, true);
+    }
+
+    private void setVisibleOrGone(View view, boolean visible) {
+        if (view != null) {
+            view.setVisibility(visible ? VISIBLE : GONE);
+        }
+    }
+
+    protected void disableCameraByUser() {
+        Resources keyguardResources;
+        PackageManager pm = mContext.getPackageManager();
+        try {
+            keyguardResources = pm.getResourcesForApplication("com.android.keyguard");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        final boolean cameraDefault = keyguardResources.getBoolean(
+                keyguardResources.getIdentifier(
+                "com.android.keyguard:bool/kg_enable_camera_default_widget", null, null));
+        mCameraDisabledByUser = Settings.System.getIntForUser(
+                mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_CAMERA_WIDGET,
+                cameraDefault ? 1 : 0,
+                UserHandle.USER_CURRENT) == 0;
     }
 
     private boolean isCameraDisabledByDpm() {
@@ -1064,43 +1077,13 @@ public class NavigationBarView extends LinearLayout {
                         mVertical ? "true" : "false",
                         mShowMenu ? "true" : "false"));
 
-<<<<<<< HEAD
         dumpButton(pw, "back", getBackButton());
         dumpButton(pw, "home", getHomeButton());
         dumpButton(pw, "rcnt", getRecentsButton());
-        dumpButton(pw, "menu", getMenuButton());
+        dumpButton(pw, "menu", getRightMenuButton());
         dumpButton(pw, "srch", getSearchLight());
         dumpButton(pw, "cmra", getCameraButton());
 
-=======
-        final View back = getBackButton();
-        final View home = getHomeButton();
-        final View recent = getRecentsButton();
-        final View menu = getRightMenuButton();
-
-        if (back != null) {
-            pw.println("      back: "
-                    + PhoneStatusBar.viewInfo(back)
-                    + " " + visibilityToString(back.getVisibility())
-                    );
-        }
-        if (home != null) {
-            pw.println("      home: "
-                    + PhoneStatusBar.viewInfo(home)
-                    + " " + visibilityToString(home.getVisibility())
-                    );
-        }
-        if (recent != null) {
-            pw.println("      rcnt: "
-                    + PhoneStatusBar.viewInfo(recent)
-                    + " " + visibilityToString(recent.getVisibility())
-                    );
-        }
-        pw.println("      menu: "
-                + PhoneStatusBar.viewInfo(menu)
-                + " " + visibilityToString(menu.getVisibility())
-                );
->>>>>>> bbbb6f6... fb: Slims navbar and navring customizations
         pw.println("    }");
     }
 
