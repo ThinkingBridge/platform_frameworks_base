@@ -58,7 +58,7 @@ import android.widget.FrameLayout;
 import com.android.internal.util.slim.ButtonConfig;
 import com.android.internal.util.slim.ButtonsConstants;
 import com.android.internal.util.slim.ButtonsHelper;
-import com.android.internal.util.slim.ColorHelper;
+import com.android.internal.util.slim.ImageHelper;
 import com.android.internal.util.slim.DeviceUtils;
 import com.android.internal.util.slim.SlimActions;
 import com.android.internal.widget.multiwaveview.GlowPadView;
@@ -480,11 +480,11 @@ public class SearchPanelView extends FrameLayout implements
                 try {
                     Drawable customIcon;
                     if (iconFile.exists()) {
-                        customIcon = ColorHelper.resize(mContext,
+                        customIcon = ImageHelper.resize(mContext,
                             new BitmapDrawable(getResources(), iconFile.getAbsolutePath()), 50);
                     } else {
                         customIcon = new BitmapDrawable(getResources(),
-                                    ColorHelper.getColoredBitmap(ColorHelper.resize(mContext,
+                                    ImageHelper.getColoredBitmap(ImageHelper.resize(mContext,
                                     getResources().getDrawable(getResources().getIdentifier(
                                     customIconUri.substring(
                                     ButtonsConstants.SYSTEM_ICON_IDENTIFIER.length()),
@@ -544,7 +544,7 @@ public class SearchPanelView extends FrameLayout implements
 
         if (aInfo != null && pm != null) {
             return new TargetDrawable(mResources,
-                setStateListDrawable(ColorHelper.resize(mContext, aInfo.loadIcon(pm), 50)));
+                setStateListDrawable(ImageHelper.resize(mContext, aInfo.loadIcon(pm), 50)));
         }
         return noneDrawable;
     }
@@ -553,9 +553,9 @@ public class SearchPanelView extends FrameLayout implements
         if (activityIcon == null) {
             return null;
         }
-        Drawable iconBg = ColorHelper.resize(mContext,
+        Drawable iconBg = ImageHelper.resize(mContext,
             mResources.getDrawable(R.drawable.ic_navbar_blank), 60);
-        Drawable iconBgActivated = ColorHelper.resize(mContext,
+        Drawable iconBgActivated = ImageHelper.resize(mContext,
             mResources.getDrawable(R.drawable.ic_navbar_blank_activated), 60);
         int margin = (int)(iconBg.getIntrinsicHeight() / 3);
         LayerDrawable icon = new LayerDrawable (new Drawable[] {iconBg, activityIcon});

@@ -554,6 +554,11 @@
     <string name="chamber_name_message">Give the shortcut a name to display with the icon.</string>
     <string name="chamber_name_toast">Using default name</string>
 
+    
+    <!-- QS Battery Tile -->
+    <string name="quick_settings_battery_charging">Charging</string>
+    <string name="quick_settings_battery_discharging">Discharging</string>
+    
     <!-- Quick Settings -->
     <string name="quick_settings_gps">GPS</string>
     <string name="quick_settings_gps_off">GPS off</string>

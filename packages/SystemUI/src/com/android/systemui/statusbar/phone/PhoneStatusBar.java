@@ -127,7 +127,8 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
+public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
+        NetworkController.UpdateUIListener {
     static final String TAG = "PhoneStatusBar";
     public static final boolean DEBUG = BaseStatusBar.DEBUG;
     public static final boolean SPEW = false;
@@ -309,6 +310,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     private boolean mBrightnessControl = true;
     private float mScreenWidth;
     private int mMinBrightness;
+    private int mPeekHeight;
     int mLinger;
     int mInitialTouchX;
     int mInitialTouchY;
@@ -383,9 +385,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_SHORTCUTS_CONFIG),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NOTIFICATION_HIDE_CARRIER),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_BUTTON_TINT),
@@ -3388,14 +3387,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
     void updateResources() {
     	final Context context = mContext;
         final Resources res = context.getResources();
-
-        // detect theme ui mode change
-        int uiThemeMode = res.getConfiguration().uiThemeMode;
-        if (uiThemeMode != mCurrUiThemeMode) {
-            mCurrUiThemeMode = uiThemeMode;
-            recreateStatusBar(false);
-            return;
-        }
 
         if (mClearButton instanceof TextView) {
             ((TextView)mClearButton).setText(

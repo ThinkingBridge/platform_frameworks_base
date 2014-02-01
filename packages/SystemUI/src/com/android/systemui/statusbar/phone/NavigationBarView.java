@@ -134,7 +134,6 @@ public class NavigationBarView extends LinearLayout {
 
     // used to disable the camera icon in navbar when disabled by DPM
     private boolean mCameraDisabledByDpm;
-    private boolean mCameraDisabledByUser;
 
     // performs manual animation in sync with layout transitions
     private final NavTransitionListener mTransitionListener = new NavTransitionListener();
@@ -258,7 +257,6 @@ public class NavigationBarView extends LinearLayout {
 
         mBarTransitions = new NavigationBarTransitions(this);
 
-        disableCameraByUser();
         mCameraDisabledByDpm = isCameraDisabledByDpm();
         watchForDevicePolicyChanges();
 
@@ -730,8 +728,8 @@ public class NavigationBarView extends LinearLayout {
             && !((disabledFlags & View.STATUS_BAR_DISABLE_SEARCH) != 0);
         final View cameraButton = getCameraButton();
         if (cameraButton != null) {
-            setVisibleOrGone(cameraButton, shouldShowCamera && !mCameraDisabledByDpm
-                    && !mCameraDisabledByUser);
+            cameraButton.setVisibility(
+                    shouldShowCamera && !mCameraDisabledByDpm ? View.VISIBLE : View.GONE);
         }
 
         mBarTransitions.applyBackButtonQuiescentAlpha(mBarTransitions.getMode(), true /*animate*/);
@@ -743,26 +741,6 @@ public class NavigationBarView extends LinearLayout {
         if (view != null) {
             view.setVisibility(visible ? VISIBLE : GONE);
         }
-    }
-
-    protected void disableCameraByUser() {
-        Resources keyguardResources;
-        PackageManager pm = mContext.getPackageManager();
-        try {
-            keyguardResources = pm.getResourcesForApplication("com.android.keyguard");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        final boolean cameraDefault = keyguardResources.getBoolean(
-                keyguardResources.getIdentifier(
-                "com.android.keyguard:bool/kg_enable_camera_default_widget", null, null));
-        mCameraDisabledByUser = Settings.System.getIntForUser(
-                mContext.getContentResolver(),
-                Settings.System.LOCKSCREEN_CAMERA_WIDGET,
-                cameraDefault ? 1 : 0,
-                UserHandle.USER_CURRENT) == 0;
     }
 
     private boolean isCameraDisabledByDpm() {
