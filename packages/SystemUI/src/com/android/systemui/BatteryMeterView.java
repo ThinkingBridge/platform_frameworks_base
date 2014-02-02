@@ -457,7 +457,11 @@ public class BatteryMeterView extends View implements DemoMode {
             if (mBatteryTypeView.equals("statusbar")) {
                 height = metrics.density * 16f + 0.5f;
                 if (mBatteryStyle == BATTERY_STYLE_PERCENT) {
+<<<<<<< HEAD
                     width = metrics.density * 28f + 0.5f;
+=======
+                    width = metrics.density * 38f + 0.5f;
+>>>>>>> 334a610... Frameworks: Port Lockscreen Targets and Shortcuts to SlimKat
                 } else {
                     width = metrics.density * 10.5f + 0.5f;
                 }
