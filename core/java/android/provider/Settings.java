@@ -3033,13 +3033,6 @@ public final class Settings {
         public static final String MENU_VISIBILITY = "menu_visibility";
 
         /**
-         * Whether to control brightness from status bar
-         * @hide
-         */
-        public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
-
-
-        /**
          * Hide network labels in the notification drawer
          * @hide
          */
