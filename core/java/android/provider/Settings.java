@@ -2689,27 +2689,6 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
-         * Text color for advanced power menu
-         *
-         * @hide
-         */
-        public static final String POWER_MENU_TEXT_COLOR = "power_menu_text_color";
-
-        /**
-         * Icon color for advanced power menu
-         *
-         * @hide
-         */
-        public static final String POWER_MENU_ICON_COLOR = "power_menu_icon_color";
-
-        /**
-         * Icon color mode for advanced power menu
-         *
-         * @hide
-         */
-        public static final String POWER_MENU_ICON_COLOR_MODE = "power_menu_icon_color_mode";
-
-        /**
          * Expanded desktop on/off state
          * @hide
          */
@@ -3057,12 +3036,28 @@ public final class Settings {
          */
         public static final String NOTIFICATION_SHORTCUTS_COLOR_MODE = "notification_shortcuts_color_mode";
 
+
         /**
-         * Config for advanced power menu
-         *
+         * Whether the power menu reboot menu is enabled
          * @hide
          */
-        public static final String POWER_MENU_CONFIG = "power_menu_config";
+        public static final String POWER_MENU_REBOOT_ENABLED = "power_menu_reboot_enabled";
+
+        /**
+         * Whether power menu screenshot is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_SCREENSHOT_ENABLED = "power_menu_screenshot_enabled";
+        /**
+         * Whether power menu airplane toggle is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_AIRPLANE_ENABLED = "power_menu_airplane_enabled";
+        /**
+         * Whether power menu silent mode is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_SOUND_ENABLED = "power_menu_silent_enabled";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -5068,6 +5063,12 @@ public final class Settings {
         public static final String PAYMENT_SERVICE_SEARCH_URI = "payment_service_search_uri";
 
         /**
+         * Whether to include options in power menu for rebooting into recovery or bootloader
+         * @hide
+         */
+        public static final String ADVANCED_REBOOT = "advanced_reboot";
+
+        /*
          * This are the settings to be backed up.
          *
          * NOTE: Settings are backed up and restored in the order they appear
