@@ -339,12 +339,6 @@
         <item>zh_CN</item>
         <item>zh_TW</item>
     </string-array>
-
-    <!-- Used in LocalePicker -->
-    <string-array translatable="false" name="special_locale_names">
-        <item>中文 (简体)</item>
-        <item>中文 (繁體)</item>
-    </string-array>
     
     <!-- Defines the shutdown options shown in the reboot dialog. -->
     <array name="shutdown_reboot_options" translatable="false">
@@ -360,7 +354,13 @@
         <item>recovery</item>
         <item>bootloader</item>
     </string-array>
-    
+
+    <!-- Used in LocalePicker -->
+    <string-array translatable="false" name="special_locale_names">
+        <item>中文 (简体)</item>
+        <item>中文 (繁體)</item>
+    </string-array>
+
     <!-- Do not translate. Defines the mapping of notification package names
      from the actual triggering package to the user selectable package.
      E.g. GTalk notifications come via Google Services Framework

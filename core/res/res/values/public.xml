@@ -2125,4 +2125,9 @@
   <public type="drawable" name="launcher_calendar_num30" id="0x010800d6" />
   <public type="drawable" name="launcher_calendar_num31" id="0x010800d7" />
 
+  <!-- CTS tests reference these resources, but fail because we added
+       new ones, changing the order, and Google didn't declare these
+       as public resources. This fixes it for the 4.4_r1 CTS release. -->
+  <public type="bool" name="config_useFixedVolume" id="0x1110056" />
+  <public type="array" name="networkAttributes" id="0x107000b" />
 </resources>

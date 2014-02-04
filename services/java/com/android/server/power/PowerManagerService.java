@@ -319,6 +319,11 @@ public final class PowerManagerService extends IPowerManager.Stub
     // The screen off timeout setting value in milliseconds.
     private int mScreenOffTimeoutSetting;
 
+    // Slim settings - override config for ElectronBeam
+    // used here to send values to DispLayPowerController handler
+    // from SettingsObserver
+    private int mElectronBeamMode;
+
     // The maximum allowable screen off timeout according to the device
     // administration policy.  Overrides other settings.
     private int mMaximumScreenOffTimeoutFromDeviceAdmin = Integer.MAX_VALUE;
@@ -519,6 +524,9 @@ public final class PowerManagerService extends IPowerManager.Stub
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SCREEN_BRIGHTNESS_MODE),
                     false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SYSTEM_POWER_CRT_MODE),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
 
             // Go.
             readConfigurationLocked();
@@ -565,6 +573,11 @@ public final class PowerManagerService extends IPowerManager.Stub
                 UserHandle.USER_CURRENT);
         mStayOnWhilePluggedInSetting = Settings.Global.getInt(resolver,
                 Settings.Global.STAY_ON_WHILE_PLUGGED_IN, BatteryManager.BATTERY_PLUGGED_AC);
+
+        mElectronBeamMode = Settings.System.getIntForUser(resolver,
+                Settings.System.SYSTEM_POWER_CRT_MODE,
+                1, UserHandle.USER_CURRENT);
+
 
         final int oldScreenBrightnessSetting = mScreenBrightnessSetting;
         mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
@@ -1506,11 +1519,13 @@ public final class PowerManagerService extends IPowerManager.Stub
 
     private int getScreenOffTimeoutLocked() {
         int timeout = mScreenOffTimeoutSetting;
-        if (isMaximumScreenOffTimeoutFromDeviceAdminEnforcedLocked()) {
-            timeout = Math.min(timeout, mMaximumScreenOffTimeoutFromDeviceAdmin);
-        }
-        if (mUserActivityTimeoutOverrideFromWindowManager >= 0) {
-            timeout = (int)Math.min(timeout, mUserActivityTimeoutOverrideFromWindowManager);
+        if (timeout != mMaximumScreenOffTimeoutFromDeviceAdmin) {
+            if (isMaximumScreenOffTimeoutFromDeviceAdminEnforcedLocked()) {
+                timeout = Math.min(timeout, mMaximumScreenOffTimeoutFromDeviceAdmin);
+            }
+            if (mUserActivityTimeoutOverrideFromWindowManager >= 0) {
+                timeout = (int)Math.min(timeout, mUserActivityTimeoutOverrideFromWindowManager);
+            }
         }
         return Math.max(timeout, MINIMUM_SCREEN_OFF_TIMEOUT);
     }
@@ -1786,6 +1801,8 @@ public final class PowerManagerService extends IPowerManager.Stub
             mDisplayPowerRequest.useProximitySensor = shouldUseProximitySensorLocked();
 
             mDisplayPowerRequest.blockScreenOn = mScreenOnBlocker.isHeld();
+
+            mDisplayPowerRequest.electronBeamMode = mElectronBeamMode;
 
             mDisplayReady = mDisplayPowerController.requestPowerState(mDisplayPowerRequest,
                     mRequestWaitForNegativeProximity);

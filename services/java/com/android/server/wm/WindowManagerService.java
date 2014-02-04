@@ -814,10 +814,10 @@ public class WindowManagerService extends IWindowManager.Stub
     public InputMonitor getInputMonitor() {
         return mInputMonitor;
     }
-
+    
     private Context getUiContext() {
-       return mContext;
-   }
+    	return mContext;
+    }
 
     @Override
     public boolean onTransact(int code, Parcel data, Parcel reply, int flags)
@@ -3200,8 +3200,15 @@ public class WindowManagerService extends IWindowManager.Stub
         // is running.
         if (okToDisplay()) {
             DisplayInfo displayInfo = getDefaultDisplayInfoLocked();
-            final int width = displayInfo.appWidth;
-            final int height = displayInfo.appHeight;
+            final int width;
+            final int height;
+            if (mPolicy.isImmersiveMode(mLastStatusBarVisibility)) {
+                width = displayInfo.logicalWidth;
+                height = displayInfo.logicalHeight;
+            } else {
+                width = displayInfo.appWidth;
+                height = displayInfo.appHeight;
+            }
             if (DEBUG_APP_TRANSITIONS || DEBUG_ANIM) Slog.v(TAG, "applyAnimation: atoken="
                     + atoken);
             Animation a = mAppTransition.loadAnimation(lp, transit, enter, width, height);
@@ -5055,6 +5062,15 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     @Override
+    public void showCustomIntentOnKeyguard(Intent intent) {
+        if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mPolicy.showCustomIntentOnKeyguard(intent);
+    }
+
+    @Override
     public void dismissKeyguard() {
         if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.DISABLE_KEYGUARD)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -5210,7 +5226,7 @@ public class WindowManagerService extends IWindowManager.Stub
     public void setTouchExplorationEnabled(boolean enabled) {
         mPolicy.setTouchExplorationEnabled(enabled);
     }
-
+    
     // Called by window manager policy.  Not exposed externally.
     @Override
     public void reboot() {
@@ -8646,8 +8662,17 @@ public class WindowManagerService extends IWindowManager.Stub
                     drawSurface.release();
                     appAnimator.thumbnailLayer = topOpeningLayer;
                     DisplayInfo displayInfo = getDefaultDisplayInfoLocked();
+                    final int width;
+                    final int height;
+                    if (mPolicy.isImmersiveMode(mLastStatusBarVisibility)) {
+                        width = displayInfo.logicalWidth;
+                        height = displayInfo.logicalHeight;
+                    } else {
+                        width = displayInfo.appWidth;
+                        height = displayInfo.appHeight;
+                    }
                     Animation anim = mAppTransition.createThumbnailAnimationLocked(
-                            transit, true, true, displayInfo.appWidth, displayInfo.appHeight);
+                            transit, true, true, width, height);
                     appAnimator.thumbnailAnimation = anim;
                     anim.restrictDuration(MAX_ANIMATION_DURATION);
                     anim.scaleCurrentDuration(mTransitionAnimationScale);
@@ -10881,8 +10906,28 @@ public class WindowManagerService extends IWindowManager.Stub
         return mWindowMap;
     }
 
+    /* @hide */
+    @Override
+    public boolean expandedDesktopHidesNavigationBar() {
+        return mPolicy.expandedDesktopHidesNavigationBar();
+    }
+
+    /* @hide */
+    @Override
+    public boolean expandedDesktopHidesStatusBar() {
+        return mPolicy.expandedDesktopHidesStatusBar();
+    }
+
+    /* @hide */
+    @Override
+    public int getCurrentNavigationBarSize() {
+        return mPolicy.getCurrentNavigationBarSize();
+    }
+
+    /* @hide */
     @Override
     public void addSystemUIVisibilityFlag(int flag) {
         mLastStatusBarVisibility |= flag;
     }
+
 }

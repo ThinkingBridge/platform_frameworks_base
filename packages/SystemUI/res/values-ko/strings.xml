@@ -200,37 +200,4 @@
     <string name="quick_settings_brightness_dialog_title" msgid="8599674057673605368">"밝기"</string>
     <string name="quick_settings_brightness_dialog_auto_brightness_label" msgid="5064982743784071218">"자동"</string>
     <string name="ssl_ca_cert_warning" msgid="9005954106902053641">"네트워크가\n모니터링될 수 있음"</string>
-    
-    <!-- QuickSettings: Battery Tile -->
-    <string name="quick_settings_battery_charging">충전중</string>
-    <string name="quick_settings_battery_discharging">방전중</string>
-    
-    <!-- QuickSettings: Immersive mode -->
-    <string name="quick_settings_immersive_mode_label">확장 모드</string>
-    <string name="quick_settings_immersive_mode_off_label">확장 모드 꺼짐</string>
-    
-    <!-- QuickSettings: Lightbulb tile [CHAR LIMIT=NONE] -->
-    <string name="quick_settings_lightbulb_label">전등</string>
-    <string name="quick_settings_lightbulb_off_label">전등 꺼짐</string>
-    
-    <!-- QuickSettings: Sleep Tile [CHAR LIMIT=NONE] -->
-    <string name="quick_settings_sleep_label">화면 끄기</string>
-    
-    <!-- USB Tether Tile [CHAR LIMIT=NONE] -->
-    <string name="quick_settings_usb_tether_connected_label">테더링</string>
-    <string name="quick_settings_usb_tether_on_label">테더링 꺼짐</string>
-    
-    <!-- QuickSettings: Mobile Network [CHAR LIMIT=NONE] -->
-    <string name="quick_settings_rssi_type_label">종류</string>
-    
-    <string name="quick_settings_sync">동기화</string>
-    <string name="quick_settings_sync_off">동기화 꺼짐</string>
-    
-    <string name="quick_settings_ringer_on">소리 켜짐</string>
-    <string name="quick_settings_ringer_off">소리 꺼짐</string>
-    <string name="quick_settings_ringer_normal">소리</string>
-    <string name="quick_settings_vibration_on">진동 켜짐</string>
-    <string name="quick_settings_vibration_off">진동 꺼짐</string>
-    <string name="quick_settings_volume">볼륨</string>
-    <string name="quick_settings_volume_status">상태</string>
 </resources>

@@ -19,6 +19,7 @@ package android.view;
 import com.android.internal.view.IInputContext;
 import com.android.internal.view.IInputMethodClient;
 
+import android.content.Intent;
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -120,6 +121,13 @@ interface IWindowManager
     boolean isKeyguardSecure();
     boolean inKeyguardRestrictedInputMode();
     void dismissKeyguard();
+
+    /**
+     * Tell keyguard to show a custom intent after asking for the user's
+     * credentials.
+     * @hide
+     */
+    void showCustomIntentOnKeyguard(inout Intent intent);
 
     void closeSystemDialogs(String reason);
 
@@ -282,4 +290,26 @@ interface IWindowManager
      * @param enabled Whether touch exploration is enabled.
      */
     void setTouchExplorationEnabled(boolean enabled);
+
+    /**
+     * Get the current navigation bar state when expanded desktop is enabled.
+     *
+     * @hide
+     */
+    boolean expandedDesktopHidesNavigationBar();
+
+    /**
+     * Get the current statusbar state when expanded desktop is enabled.
+     *
+     * @hide
+     */
+    boolean expandedDesktopHidesStatusBar();
+
+    /**
+     * Get the current navbar size depended on the user value
+     * and orientation.
+     *
+     * @hide
+     */
+    int getCurrentNavigationBarSize();
 }
