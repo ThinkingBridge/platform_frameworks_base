@@ -10908,26 +10908,7 @@ public class WindowManagerService extends IWindowManager.Stub
 
     /* @hide */
     @Override
-    public boolean expandedDesktopHidesNavigationBar() {
-        return mPolicy.expandedDesktopHidesNavigationBar();
-    }
-
-    /* @hide */
-    @Override
-    public boolean expandedDesktopHidesStatusBar() {
-        return mPolicy.expandedDesktopHidesStatusBar();
-    }
-
-    /* @hide */
-    @Override
-    public int getCurrentNavigationBarSize() {
-        return mPolicy.getCurrentNavigationBarSize();
-    }
-
-    /* @hide */
-    @Override
     public void addSystemUIVisibilityFlag(int flag) {
         mLastStatusBarVisibility |= flag;
     }
-
 }

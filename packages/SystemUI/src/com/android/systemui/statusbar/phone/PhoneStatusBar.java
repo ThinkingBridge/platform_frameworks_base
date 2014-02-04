@@ -1057,16 +1057,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(ACTION_DEMO);
-<<<<<<< HEAD
         filter.addAction(ACTION_NEW_ACTIVITY);
-=======
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addDataScheme("package");
->>>>>>> github/kitkat
         context.registerReceiver(mBroadcastReceiver, filter);
 
         // listen for USER_SETUP_COMPLETE setting (per-user)
@@ -1078,14 +1075,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mBattery = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
         updateBatteryIcons();
-<<<<<<< HEAD
         updateBackground();
         mNetworkController.setListener(this);
-=======
 
-        mNetworkController.setListener(this);
-
->>>>>>> github/kitkat
         return mStatusBarView;
     }
 
@@ -1602,13 +1594,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
      * Listen for UI updates and refresh layout.
      */
     public void onUpdateUI() {
-<<<<<<< HEAD
-        updateCarrierLabelVisibility(true);
-    }
-
-    protected void updateCarrierLabelVisibility(boolean force) {
-        if (!mShowCarrierInPanel) return;
-=======
         if (!mCarrierAndWifiViewBlocked) {
             updateCarrierAndWifiLabelVisibility(false);
         }
@@ -1628,7 +1613,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if ((mHideLabels == 3) || mCarrierAndWifiView == null) {
             return;
         }
->>>>>>> github/kitkat
         // The idea here is to only show the carrier label when there is enough room to see it,
         // i.e. when there aren't enough notifications to fill the panel.
         if (SPEW) {
@@ -3290,7 +3274,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 // work around problem where mDisplay.getRotation() is not stable while screen is off (bug 7086018)
                 repositionNavigationBar();
                 notifyNavigationBarScreenOn(true);
-<<<<<<< HEAD
                 if (mKeyguardManager.inKeyguardRestrictedInputMode()) {
                     mTransparent = true;
                     mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
@@ -3299,9 +3282,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 updateBackground();
             }
             else if (ACTION_DEMO.equals(action)) {
-=======
-            } else if (ACTION_DEMO.equals(action)) {
->>>>>>> github/kitkat
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
                     String command = bundle.getString("command", "").trim().toLowerCase();
@@ -3313,12 +3293,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         }
                     }
                 }
-<<<<<<< HEAD
             } else if(ACTION_NEW_ACTIVITY.equals(action)) {
     			if (intent != null)
     				mPackageName = intent.getStringExtra("packagename").trim();
     			updateColor();
-=======
             } else if (Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE.equals(action)
                 || Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE.equals(action)
                 || Intent.ACTION_PACKAGE_REMOVED.equals(action)
@@ -3336,7 +3314,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     mNavigationBarView.recreateNavigationBar();
                     prepareNavigationBarView();
                 }
->>>>>>> github/kitkat
             }
         }
     };
@@ -3749,7 +3726,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             ((DemoMode)v).dispatchDemoCommand(command, args);
         }
     }
-<<<<<<< HEAD
     
     boolean black = false;
 
@@ -3984,9 +3960,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 			}
 		}
 	}
-=======
-
-    private void setNotificationAlpha() {
+	
+	private void setNotificationAlpha() {
         if (mPile == null || mNotificationData == null) {
             return;
         }
@@ -4011,6 +3986,4 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
         }
     }
-
->>>>>>> github/kitkat
 }
