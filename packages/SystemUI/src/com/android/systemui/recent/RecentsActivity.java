@@ -21,6 +21,7 @@ import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -52,8 +53,9 @@ public class RecentsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(getPackageManager().getLaunchIntentForPackage(
-                "tb.recents.RecentsActivity"));
+	Intent intent = new Intent();
+	intent.setComponent(new ComponentName("tb.recents","tb.recents.RecentsActivity"));
+        startActivity(intent);
         finish();
     }
 
