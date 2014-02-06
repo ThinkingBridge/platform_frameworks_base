@@ -53,7 +53,7 @@ public class RecentsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startActivity(getPackageManager().getLaunchIntentForPackage(
-                "com.example.multitasking"));
+                "tb.recents.RecentsActivity"));
         finish();
     }
 
