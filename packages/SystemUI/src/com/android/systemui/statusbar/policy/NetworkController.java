@@ -166,8 +166,6 @@ public class NetworkController extends BroadcastReceiver implements DemoMode {
     private boolean mHasMobileDataFeature;
 
     boolean mDataAndWifiStacked = false;
-    
-    private UpdateUIListener mUpdateUIListener = null;
 
     private UpdateUIListener mUpdateUIListener = null;
 
