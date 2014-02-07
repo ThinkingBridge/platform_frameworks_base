@@ -356,6 +356,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mWhiteColor = Color.WHITE;
     private boolean mMustChange = false;
     private boolean mTransparent = false;
+    private int mUiVisibility;
     private String SysDarkKey = "ChameleonSysDark/%s";
     private String SysWhiteKey = "ChameleonSysWhite/%s";
 
@@ -2635,11 +2636,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             final boolean nbVisible = (newVal & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0
                     || (newVal & View.NAVIGATION_BAR_TRANSIENT) != 0;
 
-            if ((newVal & View.STATUS_BAR_TRANSIENT) != 0) {
-                mTransparent = true;
-                mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
-            }
-
             sbModeChanged = sbModeChanged && sbVisible;
             nbModeChanged = nbModeChanged && nbVisible;
 
@@ -2733,16 +2729,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
-    private void checkBarMode(int mode, int windowState, BarTransitions transitions) {
-        final boolean anim = (mScreenOn == null || mScreenOn) && windowState != WINDOW_STATE_HIDDEN;
-        if(mode == 0||!anim) {
-            mTransparent = false;
-            updateColor();
-        } else if (mode <= 1||anim) {
-            mTransparent = true;
-            mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
-        }
-    }
+    private void checkBarMode(int mode, int windowState, BarTransitions transitions) {};
 
     private void finishBarAnimations() {
         mStatusBarView.getBarTransitions().finishAnimations();
@@ -2823,6 +2810,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
 
     private void notifyUiVisibilityChanged(int vis) {
+	mUiVisibility = vis;
         try {
             mWindowManagerService.statusBarVisibilityChanged(vis);
         } catch (RemoteException ex) {
@@ -3274,11 +3262,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 // work around problem where mDisplay.getRotation() is not stable while screen is off (bug 7086018)
                 repositionNavigationBar();
                 notifyNavigationBarScreenOn(true);
-                if (mKeyguardManager.inKeyguardRestrictedInputMode()) {
-                    mTransparent = true;
-                    mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
-                    mIsInKeyguard = true;
-                }
                 updateBackground();
             }
             else if (ACTION_DEMO.equals(action)) {
@@ -3752,17 +3735,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
 	private void updateBackground() {
 		try {
+			mTransparent = mStatusBarMode != 0 || mUiVisibility == 1792 || mUiVisibility == 1799;
 			if (!mScreenOn) {
 				return;
 			}
-			if (mIsInKeyguard
-					&& !mKeyguardManager.inKeyguardRestrictedInputMode()) {
-				updateColor();
-			}
-			if (mHeadsUpVerticalOffset == 0.0f) {
-				mTransparent = true;
+			if (mTransparent) 
 				mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
-			}
 			int mSysColor = getSysColor();
 			transform(isGray(mSysColor));		
 			if (mSysColor == mStatusBarColor) {
@@ -3772,7 +3750,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 				mStatusBarColor = mSysColor;
 			}
 			if (mTransparent) {
-				mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
 				updateBackgroundDelayed();
 				return;
 			}
@@ -3784,8 +3761,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 	}
 	
 	private void updateColor() {
-        mMustChange = true;
-        mBlackColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysWhiteKey, mPackageName), Color.BLACK);
+        	mMustChange = true;
+        	mBlackColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysWhiteKey, mPackageName), Color.BLACK);
 		mWhiteColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysDarkKey, mPackageName), Color.WHITE);
 	}
 
