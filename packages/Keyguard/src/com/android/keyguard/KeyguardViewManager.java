@@ -61,10 +61,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewManager;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
-import android.view.animation.ScaleAnimation;
 import android.widget.FrameLayout;
 
 /**
@@ -195,7 +191,6 @@ public class KeyguardViewManager {
         mViewManager.updateViewLayout(mKeyguardHost, mWindowLayoutParams);
         mKeyguardHost.setVisibility(View.VISIBLE);
         mKeyguardView.show();
-        disassemble(mKeyguardView,0);
         mKeyguardView.requestFocus();
     }
 
@@ -618,7 +613,6 @@ public class KeyguardViewManager {
 
         if (mKeyguardView != null) {
             mKeyguardView.onScreenTurnedOn();
-            disassemble(mKeyguardView,0);
 
             // Caller should wait for this window to be shown before turning
             // on the screen.
@@ -734,30 +728,4 @@ public class KeyguardViewManager {
             mKeyguardView.launchCamera();
         }
     }
-
-	public int disassemble(ViewGroup viewgroup, int count) {
-		int animcount = 0;
-		for (int i = 0; i < viewgroup.getChildCount(); i++) {
-			View view = viewgroup.getChildAt(i);
-			animcount++;
-            startAnim(view,count++);
-			if (view instanceof ViewGroup) {
-				count += disassemble((ViewGroup) view, ++count);
-			} 
-		}
-		return animcount;
-
-	}
-
-	public void startAnim(View view, int count) {
-		Animation anim = new ScaleAnimation(
-		           0f, 1f, 0f, 1f, 
-		           Animation.RELATIVE_TO_SELF, 0.5f, 
-		           Animation.RELATIVE_TO_SELF, 0.5f);
-		anim.setInterpolator(AnimationUtils.loadInterpolator(mContext,
-				android.R.anim.decelerate_interpolator));
-		anim.setDuration(200);
-		anim.setStartOffset(80 * count);
-		view.startAnimation(anim);
-	}
 }
