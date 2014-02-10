@@ -314,7 +314,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     int mEdgeBorder; // corresponds to R.dimen.status_bar_edge_ignore
     boolean mTracking;
     VelocityTracker mVelocityTracker;
-    
+
     //center clock
 	private TextView mCenterClock;
 
@@ -343,7 +343,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private BatteryMeterView mBattery;
     private BatteryCircleMeterView mCircleBattery;
-    
+
     //Chameleon
     private boolean mIsInKeyguard;
     private int mStatusBarColor;
@@ -1069,9 +1069,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // listen for USER_SETUP_COMPLETE setting (per-user)
         resetUserSetupObserver();
-        
+
         mNotificationShortcutsLayout.setupShortcuts();
-        
+
         mVelocityTracker = VelocityTracker.obtain();
         mBattery = (BatteryMeterView) mStatusBarView.findViewById(R.id.battery);
         mCircleBattery = (BatteryCircleMeterView) mStatusBarView.findViewById(R.id.circle_battery);
@@ -3530,7 +3530,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mSettingsPanelGravity <= 0) {
             mSettingsPanelGravity = Gravity.END | Gravity.TOP;
         }
-        
+
         mCarrierAndWifiViewHeight = res.getDimensionPixelSize(R.dimen.carrier_label_height);
         mNotificationHeaderHeight =
             res.getDimensionPixelSize(R.dimen.notification_panel_header_height);
@@ -3709,7 +3709,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             ((DemoMode)v).dispatchDemoCommand(command, args);
         }
     }
-    
+
     boolean black = false;
 
 	public void transform(boolean isBlack) {
@@ -3739,10 +3739,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 			if (!mScreenOn) {
 				return;
 			}
-			if (mTransparent) 
+			if (mTransparent)
 				mStatusBarView.setBackgroundColor(Color.TRANSPARENT);
 			int mSysColor = getSysColor();
-			transform(isGray(mSysColor));		
+			transform(isGray(mSysColor));
 			if (mSysColor == mStatusBarColor) {
 				updateBackgroundDelayed();
 				return;
@@ -3759,7 +3759,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 			updateBackgroundDelayed();
 		}
 	}
-	
+
 	private void updateColor() {
         	mMustChange = true;
         	mBlackColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysWhiteKey, mPackageName), Color.BLACK);
@@ -3937,7 +3937,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 			}
 		}
 	}
-	
+
 	private void setNotificationAlpha() {
         if (mPile == null || mNotificationData == null) {
             return;
