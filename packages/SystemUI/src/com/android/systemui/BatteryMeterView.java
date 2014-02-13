@@ -502,10 +502,9 @@ public class BatteryMeterView extends View implements DemoMode {
 
         if (tracker.level <= 14 && !tracker.plugged) {
             mBatteryPaint.setColor(Color.RED);
-        } else if (mBatteryColor == -2) {
-            mBatteryPaint.setColor(mChameleonBatteryColor);
         } else {
             mBatteryPaint.setColor(mChameleonBatteryColor);
+            mFramePaint.setColor(Integer.parseInt("50" + String.format("%02x%02x%02x", Color.red(mChameleonBatteryColor), Color.green(mChameleonBatteryColor), Color.blue(mChameleonBatteryColor)), 16));
         }
 
         if (tracker.plugged) {
