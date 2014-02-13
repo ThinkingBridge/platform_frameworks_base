@@ -177,7 +177,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private static final float BRIGHTNESS_CONTROL_PADDING = 0.15f;
     private static final int BRIGHTNESS_CONTROL_LONG_PRESS_TIMEOUT = 750; // ms
     private static final int BRIGHTNESS_CONTROL_LINGER_THRESHOLD = 20;
-	private static final int BACKGROUND_UPDATE_DELAY_MS = 333;
+    private static final int BACKGROUND_UPDATE_DELAY_MS = 333;
 
     // fling gesture tuning parameters, scaled to display density
     private float mSelfExpandVelocityPx; // classic value: 2000px/s
@@ -315,8 +315,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     boolean mTracking;
     VelocityTracker mVelocityTracker;
 
-    //center clock
-	private TextView mCenterClock;
+    // Center clock
+    private TextView mCenterClock;
 
     int[] mAbsPos = new int[2];
     Runnable mPostCollapseCleanup = null;
@@ -344,7 +344,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private BatteryMeterView mBattery;
     private BatteryCircleMeterView mCircleBattery;
 
-    //Chameleon
+    // Chameleon Engine
     private boolean mIsInKeyguard;
     private int mStatusBarColor;
     private String mPackageName;
@@ -891,7 +891,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         mNetworkController.addSignalCluster(signalCluster);
         signalCluster.setNetworkController(mNetworkController);
-	    signalCluster.setStatusBar(this);
+        signalCluster.setStatusBar(this);
         final boolean isAPhone = mNetworkController.hasVoiceCallingFeature();
         if (isAPhone) {
             mEmergencyCallLabel =
@@ -1046,7 +1046,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
         addText((TextView) mStatusBarView.findViewById(R.id.center_clock));
         addText((TextView) mStatusBarView.findViewById(R.id.clock));
-	addText((TextView) mStatusBarView.findViewById(R.id.traffic));
+        addText((TextView) mStatusBarView.findViewById(R.id.traffic));
 
         mKeyguardManager = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
@@ -1060,13 +1060,17 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         filter.addAction(Intent.ACTION_SCREEN_ON);
         filter.addAction(ACTION_DEMO);
         filter.addAction(ACTION_NEW_ACTIVITY);
+        context.registerReceiver(mBroadcastReceiver, filter);
+
+        // receive broadcasts for app actions
+        filter = new IntentFilter();
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
         filter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addDataScheme("package");
-        context.registerReceiver(mBroadcastReceiver, filter);
+        context.registerReceiver(mAppBroadcastReceiver, filter);
 
         // listen for USER_SETUP_COMPLETE setting (per-user)
         resetUserSetupObserver();
@@ -3266,8 +3270,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 repositionNavigationBar();
                 notifyNavigationBarScreenOn(true);
                 updateBackground();
-            }
-            else if (ACTION_DEMO.equals(action)) {
+            } else if (ACTION_DEMO.equals(action)) {
                 Bundle bundle = intent.getExtras();
                 if (bundle != null) {
                     String command = bundle.getString("command", "").trim().toLowerCase();
@@ -3280,10 +3283,17 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     }
                 }
             } else if(ACTION_NEW_ACTIVITY.equals(action)) {
-    			if (intent != null)
-    				mPackageName = intent.getStringExtra("packagename").trim();
-    			updateColor();
-            } else if (Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE.equals(action)
+            	if (intent != null)
+            		mPackageName = intent.getStringExtra("packagename").trim();
+            	updateColor();
+            }
+        }
+    };
+
+    private BroadcastReceiver mAppBroadcastReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE.equals(action)
                 || Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE.equals(action)
                 || Intent.ACTION_PACKAGE_REMOVED.equals(action)
                 || Intent.ACTION_PACKAGE_CHANGED.equals(action)
@@ -3712,11 +3722,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             ((DemoMode)v).dispatchDemoCommand(command, args);
         }
     }
-
+    
     boolean black = false;
-
-	public void transform(boolean isBlack) {
-		if (isBlack && !black) {
+    
+    public void transform(boolean isBlack) {
+    	if (isBlack && !black) {
 			mCurrentColor = mBlackColor;
 			refresh();
 			black = true;
@@ -3764,8 +3774,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 	}
 
 	private void updateColor() {
-        	mMustChange = true;
-        	mBlackColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysWhiteKey, mPackageName), Color.BLACK);
+		mMustChange = true;
+		mBlackColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysWhiteKey, mPackageName), Color.BLACK);
 		mWhiteColor = Settings.System.getInt(mContext.getContentResolver(),String.format(SysDarkKey, mPackageName), Color.WHITE);
 	}
 
