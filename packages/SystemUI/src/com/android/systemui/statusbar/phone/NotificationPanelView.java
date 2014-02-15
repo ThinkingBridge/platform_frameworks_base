@@ -131,6 +131,8 @@ public class NotificationPanelView extends PanelView {
         mHandleBar.setState(mHandleView.getDrawableState());
         mHandleBar.draw(canvas);
         canvas.translate(0, -off);
+        setPivotX(getWidth()/2);
+        setRotationX(-2.0f);
     }
 
     @Override
