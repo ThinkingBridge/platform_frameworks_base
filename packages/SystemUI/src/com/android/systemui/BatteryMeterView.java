@@ -91,8 +91,8 @@ public class BatteryMeterView extends View implements DemoMode {
     private int mPercentageChargingColor;
     private boolean mPercentageOnly = false;
     private String mBatteryTypeView;
-    public int mChameleonBatteryColor;
-    public int mChameleonBoltColor;
+    public int mChameleonBatteryColor = Color.WHITE;
+    public int mChameleonBoltColor = Color.BLACK;
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
 
