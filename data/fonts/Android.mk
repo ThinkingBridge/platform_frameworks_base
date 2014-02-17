@@ -35,7 +35,7 @@ endef
 ##########################################
 # We may only afford small font footprint.
 ##########################################
-$(eval $(call create-font-symlink,DroidSans.ttf,Roboto-Regular.ttf))
+$(eval $(call create-font-symlink,DroidSans.ttf,Roboto-Light.ttf))
 $(eval $(call create-font-symlink,DroidSans-Bold.ttf,Roboto-Bold.ttf))
 
 ################################

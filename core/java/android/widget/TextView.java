@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Insets;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -2622,6 +2623,16 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
      */
     @android.view.RemotableViewMethod
     public void setTextColor(int color) {
+	if (Color.parseColor("#33b5e5") == color) {
+	    TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                      new int[] {android.R.attr.colorBackground});
+            int bgcolor = a.getColor(0, 0xFF00FF);
+	    if (bgcolor == Color.BLACK) {
+		color = Color.WHITE;
+	    } else {
+		color = Color.parseColor("#3e3e3e");
+	    }
+	}
         mTextColor = ColorStateList.valueOf(color);
         updateTextColors();
     }
