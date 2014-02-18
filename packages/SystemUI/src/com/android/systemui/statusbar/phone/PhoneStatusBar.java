@@ -3739,6 +3739,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 				mCurrentColor = mWhiteColor;
 				refresh();
 			}
+			mMustChange = false;
 		}
 	}
 
@@ -3756,10 +3757,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 			        updateBackgroundDelayed();
 			        return;
 		            }
-                            mMustChange = false;
-			} else {
+      			} else {
 				mStatusBarColor = mSysColor;
 			}
+                        mBattery.mChameleonBoltColor = mStatusBarColor;
+                        mBattery.updateBattery();
 			transform(isGray(mSysColor));
 			if (mTransparent) {
 				updateBackgroundDelayed();
@@ -3875,6 +3877,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
 		for (TextView tv : mTexts) {
 			if (tv != null) {
+				tv.mTransColor = false;
 				tv.setTextColor(mCurrentColor);
 			} else {
 				mTexts.remove(tv);
@@ -3882,9 +3885,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 		}
 		mCircleBattery.setCircleColor(mCurrentColor);
 		mBattery.mChameleonBatteryColor = mCurrentColor;
-		mBattery.mChameleonBoltColor = mStatusBarColor;
-		mBattery.updateBattery();
-		mBattery.invalidate();
+		mBattery.updateSettings();
 	}
 
 	private void updateBackgroundDelayed() {
