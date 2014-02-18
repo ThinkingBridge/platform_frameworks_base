@@ -27,7 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
-import andorid.view.View.OnTouchListener;
 import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
@@ -100,6 +99,7 @@ public class FrameLayout extends ViewGroup {
 
     public FrameLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
         TypedArray a = context.obtainStyledAttributes(attrs, com.android.internal.R.styleable.FrameLayout,
                     defStyle, 0);
 
@@ -668,11 +668,5 @@ public class FrameLayout extends ViewGroup {
 
             this.gravity = source.gravity;
         }
-    }
-
-    @Override
-    public void setOnTouchListener(OnTouchListener l)
-	super.setOnTouchListener(l);
-	initReceiver();
     }
 }

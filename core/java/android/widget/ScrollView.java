@@ -229,7 +229,6 @@ public class ScrollView extends FrameLayout {
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
         mOverscrollDistance = configuration.getScaledOverscrollDistance();
         mOverflingDistance = configuration.getScaledOverflingDistance();
-	initReceiver();
     }
 
     @Override
