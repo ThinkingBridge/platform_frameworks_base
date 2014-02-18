@@ -16,8 +16,11 @@
 
 package android.view;
 
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -50,6 +53,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.text.TextUtils;
+import android.thinkingbridge.TBUtil;
 import android.util.AttributeSet;
 import android.util.FloatProperty;
 import android.util.LayoutDirection;
@@ -3436,6 +3440,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
      */
     public View(Context context) {
         mContext = context;
+	initReceiver();
         mResources = context != null ? context.getResources() : null;
         mViewFlags = SOUND_EFFECTS_ENABLED | HAPTIC_FEEDBACK_ENABLED;
         // Set some flags defaults
@@ -4043,6 +4048,14 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         }
         out.append("}");
         return out.toString();
+    }
+
+    public void initReceiver() {
+	getContext().registerReceiver(new BroadcastReceiver() {
+	    public void onReceive(Context context,Intent intent) {
+		TBUtil.onTouchStatusBar(View.this);
+	    }
+	},new IntentFilter("tb.statusbar.CLICKED"));
     }
 
     /**

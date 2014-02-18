@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -156,6 +157,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             = "com.android.internal.policy.statusbar.START";
     private static final String ACTION_NEW_ACTIVITY
             = "tb.newactivity";
+    private static final String ACTION_STATUSBAR_CLICKED
+	    = "tb.statusbar.CLICKED";
 
     private static final int MSG_OPEN_NOTIFICATION_PANEL = 1000;
     private static final int MSG_CLOSE_PANELS = 1001;
@@ -356,6 +359,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private int mUiVisibility;
     private String SysDarkKey = "ChameleonSysDark/%s";
     private String SysWhiteKey = "ChameleonSysWhite/%s";
+    private long touchedMili;
 
     // XXX: gesture research
     private final GestureRecorder mGestureRec = DEBUG_GESTURES
@@ -731,11 +735,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     }
                 }
                 return mStatusBarWindow.onTouchEvent(event);
-            }});
+            }
+	});
 
         mStatusBarView = (PhoneStatusBarView) mStatusBarWindow.findViewById(R.id.status_bar);
         mStatusBarView.setBar(this);
-
         PanelHolder holder = (PanelHolder) mStatusBarWindow.findViewById(R.id.panel_holder);
         mStatusBarView.setPanelHolder(holder);
 
@@ -2543,7 +2547,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
 
         brightnessControl(event);
-
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    touchedMili = java.lang.System.currentTimeMillis();
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (java.lang.System.currentTimeMillis() - touchedMili < 175)
+                mContext.sendBroadcast(new Intent(ACTION_STATUSBAR_CLICKED));
+        }
         return false;
     }
 

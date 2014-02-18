@@ -861,6 +861,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
 
         setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE
             | ViewGroup.PERSISTENT_SCROLLING_CACHE);
+	initReceiver();
     }
 
     @Override
