@@ -520,13 +520,9 @@ public class BatteryMeterView extends View implements DemoMode {
         } else {
             if (tracker.level <= 14 && (mBatteryStyle == BATTERY_STYLE_PERCENT
                     || mBatteryStyle == BATTERY_STYLE_ICON_PERCENT)) {
-                mTextPaint.setColor(Color.RED);
+                mTextPaint.setColor(mChameleonBatteryColor);
             } else if (mPercentageColor == -2) {
-                if (mBatteryStyle == BATTERY_STYLE_ICON_PERCENT) {
-                	mTextPaint.setColor(mChameleonBatteryColor);
-                } else {
-                    mTextPaint.setColor(mChameleonBoltColor);
-                }
+                mTextPaint.setColor(mChameleonBatteryColor);
             }
         }
         postInvalidate();
